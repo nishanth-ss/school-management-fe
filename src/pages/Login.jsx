@@ -71,7 +71,7 @@ const Login = () => {
             <Shield className="text-primary text-2xl" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-800">
-            InMate Financial System
+            School Management System
           </CardTitle>
           <p className="text-gray-600 mt-2">Admin Dashboard Login</p>
         </CardHeader>

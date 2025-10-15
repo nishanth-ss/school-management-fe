@@ -1,23 +1,52 @@
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Badge } from "../../components/ui/badge"
-import { Card, CardContent } from "../../components/ui/card";
+import { Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
-import InmateForm from "../../Components/InmateForm"
 import useFetchData from "../../hooks/useFetchData"
 import { useHandleDelete } from "../../hooks/useHandleDelete"
-import { Box, Snackbar, TableSortLabel } from "@mui/material"
+import { Box, Button, InputAdornment, Snackbar, Stack, TextField, IconButton } from "@mui/material"
 import { useSnackbar } from "notistack"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TablePagination,
-} from "@mui/material";
+import CommonDataGrid from "@/components/common/CustomDatagrid";
+import StudentFormModal from "@/components/StudentForm";
+
+const rows = [
+    { id: 1, name: "Arjun Kumar", rollNo: "S001", class: "10A", age: 15, contact: "9876543210" },
+    { id: 2, name: "Priya Sharma", rollNo: "S002", class: "10B", age: 14, contact: "9876543211" },
+    { id: 3, name: "Ravi Singh", rollNo: "S003", class: "9A", age: 13, contact: "9876543212" },
+];
+
+const columns = [
+    { field: "id", headerName: "S.NO", flex: 0.5 },
+    { field: "name", headerName: "Student Name", flex: 1 },
+    { field: "rollNo", headerName: "Roll No", flex: 1 },
+    { field: "class", headerName: "Class", flex: 1 },
+    { field: "age", headerName: "Age", flex: 1 },
+    { field: "contact", headerName: "Contact No", flex: 1 },
+    {
+        field: "actions",
+        headerName: "Actions",
+         flex: 1,
+        sortable: false,
+        renderCell: (params) => (
+            <Stack direction="row" spacing={1} >
+                <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    onClick={() => alert(`View ${params.row.name}`)}
+                >
+                    View
+                </Button>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    color="error"
+                    onClick={() => alert(`Delete ${params.row.name}`)}
+                >
+                    Delete
+                </Button>
+            </Stack>
+        ),
+    },
+];
 
 function InMateManageMent() {
     const { enqueueSnackbar } = useSnackbar();
@@ -31,6 +60,17 @@ function InMateManageMent() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [order, setOrder] = useState("desc");
     const [orderBy, setOrderBy] = useState("inmateId");
+    const [searchValue, setSearchValue] = useState("");
+
+    const handleChange = (e) => {
+        setSearchValue(e.target.value);
+        if (onSearch) onSearch(e.target.value); // Optional: pass value to parent
+    };
+
+    const handleClear = () => {
+        setSearchValue("");
+        if (onSearch) onSearch("");
+    };
 
     const url = React.useMemo(() => {
         if (searchItem) {
@@ -109,192 +149,47 @@ function InMateManageMent() {
                 <div className="flex justify-between items-start mb-8">
                     <div className="flex space-x-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Inmate Management</h1>
-                            <p className="text-gray-600">Manage inmate profiles and demographics</p>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Student Management</h1>
+                            <p className="text-gray-600">Manage Student profiles and demographics</p>
                         </div>
                         <h1 className="text-xl flex items-center font-semibold h-[40px] text-blue-600 bg-blue-100 px-3 py-1 rounded-md shadow-sm">
-                            Total Inmates: {data?.totalItems || 0}
+                            Total Student: {rows.length || 0}
                         </h1>
                     </div>
-                    <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                        <DialogTrigger asChild>
-                            <Button onClick={handleAdd} className="bg-blue-500">
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add New Inmate
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl bg-[#fff]">
-                            <DialogHeader>
-                                <DialogTitle>
-                                    {selectedInmate ? "Edit Inmate" : "Add New Inmate"}
-                                </DialogTitle>
-                            </DialogHeader>
-                            <InmateForm
-                                inmate={selectedInmate}
-                                setRefetch={setRefetch}
-                                refetch={refetch}
-                                setIsFormOpen={setIsFormOpen}
-                                selectedInmate={selectedInmate}
-                                setSelectedInmate={setSelectedInmate}
-                                setOpenAlert={setOpenAlert}
-                                openAlert={openAlert}
-                                onSuccess={() => {
-                                    setIsFormOpen(false);
-                                    setSelectedInmate(null)
+                    <StudentFormModal />
 
-                                }}
-                            />
-                        </DialogContent>
-                    </Dialog>
                 </div>
 
-                <Card className="mb-6  border border-[#3498db]">
-                    <CardContent className="p-6">
-                        <div className="flex items-center space-x-4">
-                            <div className="flex-1">
-                                <div className="relative ">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 " />
-                                    <Input
-                                        placeholder="Search by name, ID, or cell number"
-                                        onChange={(e) => {
-                                            setSearchItem(e.target.value)
-                                            setPage(0)
-                                            setRefetch(refetch + 1)
-                                        }}
-                                        className="pl-10  border border-[#3498db]"
-                                    />
-                                </div>
-                            </div>
-                            <Button variant="outline">
-                                <Search className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Table */}
-                <div className="bg-white rounded-lg border border-[#3498db]">
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "inmateId"}
-                                        direction={orderBy === "inmateId" ? order : "asc"}
-                                        onClick={() => handleRequestSort("inmateId")}
-                                    >
-                                        Inmate ID
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "firstName"}
-                                        direction={orderBy === "firstName" ? order : "dsc"}
-                                        onClick={() => handleRequestSort("firstName")}
-                                    >
-                                        Name
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "custodyType"}
-                                        direction={orderBy === "custodyType" ? order : "dsc"}
-                                        onClick={() => handleRequestSort("custodyType")}
-                                    >
-                                        UT/CT/RP
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "cellNumber"}
-                                        direction={orderBy === "cellNumber" ? order : "dsc"}
-                                        onClick={() => handleRequestSort("cellNumber")}
-                                    >
-                                        Cell Number
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "balance"}
-                                        direction={orderBy === "balance" ? order : "dsc"}
-                                        onClick={() => handleRequestSort("balance")}
-                                    >
-                                        Balance
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={orderBy === "status"}
-                                        direction={orderBy === "status" ? order : "dsc"}
-                                        onClick={() => handleRequestSort("status")}
-                                    >
-                                        Status
-                                    </TableSortLabel>
-                                </TableCell>
-
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-                            {data?.data?.length > 0 ? data?.data?.map((inmate) => (
-                                <TableRow key={inmate._id} className="border-b last:border-b-0">
-                                    <TableCell className="text-gray-900">{inmate.inmateId}</TableCell>
-                                    <TableCell className="text-gray-900">{inmate.firstName + " " + inmate.lastName}</TableCell>
-                                    <TableCell className="text-gray-600">{inmate.custodyType}</TableCell>
-                                    <TableCell className="text-gray-600">{inmate.cellNumber}</TableCell>
-                                    <TableCell sx={{ color: "#4ade80", fontWeight: 600 }}>{inmate.balance}</TableCell>
-                                    <TableCell>
-                                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                                            {inmate.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => {
-                                                setIsFormOpen(true)
-                                                setSelectedInmate(inmate)
-                                            }}>
-                                                <Edit className="w-4 h-4 text-gray-600" />
-                                            </Button>
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0"
-                                                onClick={() => {
-                                                    deleteItem(inmate?._id)
-                                                }}
-                                            >
-                                                <Trash2 className="w-4 h-4 text-gray-600" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )) : (
-                                <TableRow>
-                                    <TableCell colSpan={8} sx={{
-                                        textAlign: "center",
-                                        color: "gray",
-                                        py: 2
-                                    }}>
-                                        No inmate available
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-
-                    <TablePagination
-                        component="div"
-                        count={data?.totalItems || 0}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
+                <div className="flex flex-col w-full md:w-[50%] md:flex-row md:items-center justify-between mb-4 space-y-4 md:space-y-0 md:space-x-4">
+                    {/* Search Bar */}
+                    <TextField
+                        value={searchValue}
+                        onChange={handleChange}
+                        placeholder="Search..."
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search />
+                                </InputAdornment>
+                            ),
+                            endAdornment: searchValue && (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={handleClear} size="small">
+                                        <Clear />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </div>
+
+
+                {/* Table */}
+
+                <CommonDataGrid rows={rows} columns={columns} />;
             </div>
         </div >
     )

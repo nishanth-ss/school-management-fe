@@ -7,6 +7,7 @@ import LocationDialogBox from "../LocationDialogBox.jsx";
 import { useEffect, useState } from "react";
 import useFetchData from "@/hooks/useFetchData";
 import DBLocationModal from "../DBLocationModal";
+import SchoolLocationDialogBox from "../SchoolLocationDialogBox";
 
 export default function Header() {
 
@@ -79,15 +80,14 @@ export default function Header() {
                         <Shield className="text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-gray-800">InMate Financial System</h1>
+                        <h1 className="text-xl font-bold text-gray-800">School Management</h1>
                         <p className="text-sm text-gray-600">Administrative Dashboard</p>
                     </div>
                 </div>
                 <div className="flex items-center space-x-4">
                     {(userRole === "ADMIN") && <div className="flex items-center">
-                        {/* <div className="flex flex-col justify-center items-center"> */}
                         <div className="grid grid-cols-3 gap-2 pl-10 text-center pr-5">
-                            {
+                            {/* {
                                 selectedLocation?.custodyLimits?.map((val, index) => {
                                     return <div className="border-r border-gray-400 pr-2" key={index}>
                                         <p>{val.custodyType === "remand_prison" ? "Remand Prison" : val.custodyType === "under_trail" ? "Under Trail" : "Contempt of Court"}</p>
@@ -97,9 +97,8 @@ export default function Header() {
                                         </div>
                                     </div>
                                 })
-                            }
+                            } */}
                         </div>
-                        {/* </div> */}
                         <div className="flex flex-col justify-center border-r border-gray-400 pr-2">
                             <Button variant="ghost" className="cursor-pointer w-full" size="icon" onClick={() => setLocationModal(true)}>
                                 <MapPin className={`w-full ${!selectedLocation?.locationName ? 'text-red-500' : 'text-green-500'}`} />
@@ -147,8 +146,18 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-            <LocationDialogBox
+            {/* <LocationDialogBox
                 open={LocationModal}
+                setOpen={setLocationModal}
+                selectedLocation={locations?.[0]}
+                setSelectedLocation={setSelectedLocation}
+                setRefetch={setRefetch}
+            />
+            
+            */}
+
+            <SchoolLocationDialogBox 
+             open={LocationModal}
                 setOpen={setLocationModal}
                 selectedLocation={locations?.[0]}
                 setSelectedLocation={setSelectedLocation}
