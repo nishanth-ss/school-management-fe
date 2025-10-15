@@ -9,7 +9,7 @@ import { usePostData } from "../../hooks/usePostData"
 import { enqueueSnackbar } from "notistack"
 
 export default function BulkOperations() {
-    const [activeTab, setActiveTab] = useState("bulk-add-inmates")
+    const [activeTab, setActiveTab] = useState("bulk-add-students")
     const [csvData, setCsvData] = useState("")
     const [selectedInamteFile, setSelectedInmateFile] = useState(null)
     const [selectedWageFile, setSelectedWageFile] = useState(null)
@@ -27,12 +27,12 @@ export default function BulkOperations() {
         const token = localStorage.getItem('authToken');
 
         const apiUrl =
-            activeTab === 'bulk-add-inmates'
+            activeTab === 'bulk-add-students'
                 ? `${import.meta.env.VITE_API_URL}inmate/download-csv/${location?._id}`
                 : `${import.meta.env.VITE_API_URL}financial/wages/download-csv/${location?._id}`;
 
         const fileName =
-            activeTab === 'bulk-add-inmates' ? 'sample_inmates.csv' : 'sample_wages.csv';
+            activeTab === 'bulk-add-students' ? 'students.csv' : 'sample_wages.csv';
 
         try {
             const response = await fetch(apiUrl, {
@@ -332,7 +332,7 @@ export default function BulkOperations() {
         await new Promise((resolve) => setTimeout(resolve, 1500))
 
         setProcessedData(validation.parsedData)
-        setSuccessMessage(`Successfully processed ${validation.parsedData.length} inmates`)
+        setSuccessMessage(`Successfully processed ${validation.parsedData.length} students`)
         setIsProcessing(false)
     }
 
@@ -378,7 +378,7 @@ export default function BulkOperations() {
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-2xl md:text-2xl font-bold text-gray-900 mb-2">Bulk Operations</h1>
-                <p className="text-gray-600">Upload CSV files to add multiple inmates or process wages in bulk</p>
+                <p className="text-gray-600">Upload CSV files to add multiple students or process wages in bulk</p>
             </div>
 
             {/* Tabs */}
@@ -386,18 +386,11 @@ export default function BulkOperations() {
                 <div className="flex items-center justify-between mb-6 border-b border-b-gray-200">
                     <TabsList className="bg-transparent p-0 h-auto">
                         <TabsTrigger
-                            value="bulk-add-inmates"
+                            value="bulk-add-students"
                             className="flex items-center gap-2 px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-blue-500 data-[state=active]:text-blue-600 rounded-none cursor-pointer"
                         >
                             <Users className="w-4 h-4" />
-                            Bulk Add Inmates
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="bulk-add-wages"
-                            className="flex items-center gap-2 px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-blue-500 data-[state=active]:text-blue-600 rounded-none cursor-pointer ml-8"
-                        >
-                            <CreditCard className="w-4 h-4" />
-                            Bulk Add Wages
+                            Bulk Add Students
                         </TabsTrigger>
                     </TabsList>
 
@@ -407,9 +400,9 @@ export default function BulkOperations() {
                     </Button>
                 </div>
 
-                <TabsContent value="bulk-add-inmates">
+                <TabsContent value="bulk-add-students">
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900">Bulk Add Inmates</h2>
+                        <h2 className="text-xl font-semibold text-gray-900">Bulk Add Students</h2>
 
                         {/* CSV Format Requirements */}
                         <Card className="bg-blue-50 border-blue-200">

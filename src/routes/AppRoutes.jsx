@@ -3,7 +3,6 @@ import Login from '../pages/Login';
 import PublicRoute from './PublicRoute';
 import ProtectedRoute from './ProtectedRoute';
 
-import FinancialManagement from '../pages/FinancialManagement/FinancialManagement';
 import InMateManageMent from '../pages/InMateManageMent/InMateManageMent';
 import DashBoard from '../pages/DashBoard/DashBoard';
 import TuckShopPos from '../pages/TuckShopPos/TuckShopPos';
@@ -11,12 +10,13 @@ import Reports from '../pages/Reports/Reports';
 import MainSection from '../pages/MainSection';
 import AuditTrails from '../pages/AuditTrails/AuditTrails';
 import TransactionHistory from '../pages/TransactionHistory/TransactionHistory';
-import UserManagement from '../pages/UserManagement/UserManagement';
 import BulkOperations from '../pages/BulkOperations/BulkOperations';
 import Department from '../pages/Department/Department';
 import InmateProfile from '../pages/InMateManageMent/InmateProfile';
 import InmateTransaction from '../pages/InMateManageMent/InmateTransaction';
 import Inventory from '../pages/Inventory/inventory';
+import FeesManagement from '@/pages/FeesManagement/FeesManagement';
+import SchoolUserManagement from '@/pages/UserManagement/SchoolUserManagement';
 
 export default function AppRoutes() {
 
@@ -30,25 +30,27 @@ export default function AppRoutes() {
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/dashboard" element={<DashBoard />} />
-                    <Route path="/inmate-management" element={<InMateManageMent />} />
-                    <Route path="/financial-management" element={<FinancialManagement />} />
+                    <Route path="/student-management" element={<InMateManageMent />} />
+                    <Route path="/fees-management" element={<FeesManagement />} />
+                    <Route path="/user-management" element={<SchoolUserManagement />} />
                     <Route path="/reports" element={<Reports />} />
+                    {/* <Route path="/financial-management" element={<FinancialManagement />} /> */}
+                    
                     <Route path="/transaction-history" element={<TransactionHistory />} />
                     <Route path="/audit-trails" element={<AuditTrails />} />
-                    <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/bulk-operations" element={<BulkOperations />} />
                     <Route path="/department" element={<Department />} />
                     <Route path="/inventory" element={<Inventory />} />
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={[ "ADMIN","POS"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN", "POS"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/tuck-shop-pos" element={<TuckShopPos />} />
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={[ "INMATE"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["INMATE"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/inmate-profile" element={<InmateProfile />} />
                     <Route path="/inmate-transaction" element={<InmateTransaction />} />

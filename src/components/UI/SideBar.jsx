@@ -19,18 +19,20 @@ import Logo from "../../assets/logo.png"
 function SideBar() {
     const sideBarItems = [
         { title: "Dashboard", icon: LayoutDashboard, path: '/dashboard', roles: ["ADMIN"] },
-        { title: "Inmate Management", icon: Users, path: '/inmate-management', roles: ["ADMIN"] },
-        { title: "Financial Management", icon: ReceiptIndianRupee, path: '/financial-management', roles: ["ADMIN"] },
+        { title: "Student Management", icon: Users, path: '/student-management', roles: ["ADMIN"] },
+        { title: "Fees Management", icon: ReceiptIndianRupee, path: '/fees-management', roles: ["ADMIN"] },
+        // { title: "Canteen Management", icon: Store, path: '/canteen-management', roles: ["ADMIN"] },
+        // { title: "Financial Management", icon: ReceiptIndianRupee, path: '/financial-management', roles: ["ADMIN"] },
         { title: "Transaction History", icon: ArrowLeftRight, path: '/transaction-history', roles: ["ADMIN"] },
         { title: "Canteen POS", icon: Store, path: '/tuck-shop-pos', roles: ["ADMIN", "POS"] },
         { title: "Reports", icon: FileText, path: '/reports', roles: ["ADMIN"] },
         { title: "Bulk Operations", icon: Upload, path: '/bulk-operations', roles: ["ADMIN"] },
-        { title: "Department", icon: BellElectric, path: '/department', roles: ["ADMIN"] },
+        // { title: "Department", icon: BellElectric, path: '/department', roles: ["ADMIN"] },
         { title: "User Management", icon: UserRoundPen, path: '/user-management', roles: ["ADMIN"] },
         { title: "Inventory", icon: ShoppingBag, path: '/inventory', roles: ["ADMIN"] },
         { title: "Audit Trails", icon: ShieldCheck, path: '/audit-trails', roles: ["ADMIN"] },
-        { title: "Inmate Profile", icon: Users, path: '/inmate-profile', roles: ["INMATE"] },
-        { title: "Inmate Transaction", icon: ArrowLeftRight, path: '/inmate-transaction', roles: ["INMATE"] },
+        { title: "School Profile", icon: Users, path: '/inmate-profile', roles: ["INMATE"] },
+        { title: "School Transaction", icon: ArrowLeftRight, path: '/inmate-transaction', roles: ["INMATE"] },
     ];
 
     const pathName = useLocation();

@@ -91,7 +91,7 @@ function TransactionHistory() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50">
-                                <TableHead className="font-semibold">Inmate ID</TableHead>
+                                <TableHead className="font-semibold">Student ID</TableHead>
                                 <TableHead className="font-semibold">Items Purchased</TableHead>
                                 <TableHead className="font-semibold">Categories</TableHead>
                                 <TableHead className="font-semibold">Total Amount</TableHead>

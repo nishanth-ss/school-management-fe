@@ -90,7 +90,7 @@ function TuckShopPos() {
                         handleInmateBalance(data?.data?.data?._id)
                     }
                     if (error) {
-                        console.error("Error fetching inmate by face:", error);
+                        console.error("Error fetching student by face:", error);
                     }
                 } catch (err) {
                     console.error("Face ID fetch error:", err);
@@ -198,7 +198,7 @@ function TuckShopPos() {
             });
             setSelectedInmateItem(response?.data?.data);
         } catch (err) {
-            console.error("Error fetching inmate balance", err);
+            console.error("Error fetching student balance", err);
         }
     }
 
@@ -265,7 +265,7 @@ function TuckShopPos() {
                 {/* Header */}
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Canteen POS System</h1>
-                    <p className="text-gray-600">Process inmate purchases and manage inventory</p>
+                    <p className="text-gray-600">Process student purchases and manage inventory</p>
                 </div>
 
                 {/* Recent Purchases */}
@@ -274,7 +274,7 @@ function TuckShopPos() {
                         <CardTitle>Recent Purchases</CardTitle>
                         <div className="flex gap-2">
                             <Input
-                                placeholder="Search by Inmate ID..."
+                                placeholder="Search by Student ID..."
                                 value={purchaseSearch}
                                 onChange={(e) => setPurchaseSearch(e.target.value)}
                                 className="w-64"
@@ -293,7 +293,7 @@ function TuckShopPos() {
                         ) : filteredPurchases?.length > 0 ? filteredPurchases.map((p) => (
                             <div key={p._id} className="flex justify-between items-center border-b py-2">
                                 <div>
-                                    <p className="font-semibold">Inmate: {p.inmateId}</p>
+                                    <p className="font-semibold">Student: {p.inmateId}</p>
                                     <p className="text-sm text-gray-500">
                                         {p.products?.map(prod =>
                                             `${prod.productId?.itemName} x${prod.quantity}`
@@ -316,7 +316,7 @@ function TuckShopPos() {
                                 </div>
                             </div>
                         )) : (
-                            <p className="text-gray-500 text-center py-4">No purchases found for the searched inmate</p>
+                            <p className="text-gray-500 text-center py-4">No purchases found for the searched student</p>
                         )}
                     </CardContent>
                 </Card>
@@ -347,7 +347,7 @@ function TuckShopPos() {
                                     selectedInmateIdRef.current = newValue?.inmateId || null;
                                 }}
                                 renderInput={(params) => (
-                                    <TextField {...params} size="small" label="Select inmate" fullWidth />
+                                    <TextField {...params} size="small" label="Select student" fullWidth />
                                 )}
                             />
 
