@@ -48,8 +48,8 @@ const Login = () => {
           navigate(
             res.data?.user?.role === "POS"
               ? "/tuck-shop-pos"
-              : res.data?.user?.role === "INMATE"
-              ? "/inmate-profile"
+              : res.data?.user?.role === "STUDENT"
+              ? "/student-profile"
               : "/dashboard"
           );
         }

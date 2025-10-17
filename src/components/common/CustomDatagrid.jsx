@@ -8,17 +8,22 @@ import { Box } from "@mui/material";
 export default function CommonDataGrid({
   rows,
   columns,
-  pageSize = 5,
+  pageSize = 10,
+  height = 450,
+  width = "100%",
+  rowsPerPageOptions = [5, 10, 25, 50],
 }) {
   return (
-    <Box sx={{ height: 450, width: "100%" }}>
+    <Box sx={{ height: height, width: width }}>
       <DataGrid
         rows={rows}
         columns={columns}
-        pageSize={pageSize}
-        rowsPerPageOptions={[pageSize]}
-        disableSelectionOnClick
-        // 👇 Disable both row and cell selection
+        pageSizeOptions={rowsPerPageOptions} // ✅ correct prop name
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: pageSize, page: 0 }, // ✅ default to 10 per page
+          },
+        }}
         disableRowSelectionOnClick
         disableColumnSelection
         sx={{
@@ -28,11 +33,7 @@ export default function CommonDataGrid({
             backgroundColor: "#f5f5f5",
             fontWeight: "bold",
           },
-          // 👇 Optional: Remove the blue focus outline when clicking a cell
-          "& .MuiDataGrid-cell:focus": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-cell:focus-within": {
+          "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
             outline: "none",
           },
         }}

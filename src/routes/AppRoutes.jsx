@@ -16,7 +16,7 @@ import InmateProfile from '../pages/InMateManageMent/InmateProfile';
 import InmateTransaction from '../pages/InMateManageMent/InmateTransaction';
 import Inventory from '../pages/Inventory/inventory';
 import FeesManagement from '@/pages/FeesManagement/FeesManagement';
-import SchoolUserManagement from '@/pages/UserManagement/SchoolUserManagement';
+import UserManagement from '@/pages/UserManagement/UserManagement';
 
 export default function AppRoutes() {
 
@@ -31,8 +31,8 @@ export default function AppRoutes() {
                 <Route element={<MainSection />}>
                     <Route path="/dashboard" element={<DashBoard />} />
                     <Route path="/student-management" element={<InMateManageMent />} />
-                    <Route path="/fees-management" element={<FeesManagement />} />
-                    <Route path="/user-management" element={<SchoolUserManagement />} />
+                    {/* <Route path="/fees-management" element={<FeesManagement />} /> */}
+                    <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/reports" element={<Reports />} />
                     {/* <Route path="/financial-management" element={<FinancialManagement />} /> */}
                     
@@ -50,10 +50,10 @@ export default function AppRoutes() {
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={["INMATE"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
                 <Route element={<MainSection />}>
-                    <Route path="/inmate-profile" element={<InmateProfile />} />
-                    <Route path="/inmate-transaction" element={<InmateTransaction />} />
+                    <Route path="/student-profile" element={<InmateProfile />} />
+                    <Route path="/student-transaction" element={<InmateTransaction />} />
                 </Route>
             </Route>
 

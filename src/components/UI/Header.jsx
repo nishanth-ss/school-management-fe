@@ -7,7 +7,6 @@ import LocationDialogBox from "../LocationDialogBox.jsx";
 import { useEffect, useState } from "react";
 import useFetchData from "@/hooks/useFetchData";
 import DBLocationModal from "../DBLocationModal";
-import SchoolLocationDialogBox from "../SchoolLocationDialogBox";
 
 export default function Header() {
 
@@ -21,7 +20,7 @@ export default function Header() {
     const { data: locations, error } = useFetchData(`location`, refetch);
     const [selectedLocation, setSelectedLocation] = useState({});
     const [dbPath, setDbPath] = useState(null);
-    const [dbModal,setDbModal] = useState(false);
+    const [dbModal, setDbModal] = useState(false);
 
     useEffect(() => {
         if (locations?.[0]) {
@@ -34,30 +33,28 @@ export default function Header() {
         const url = `user/logout`;
         const method = "post";
 
-        const { data, error } = await usePostData(url);
+        // ✅ If your hook requires method or payload, include it
+        const { data, error } = await usePostData(url, {}, method);
 
         const status = error?.response?.status;
 
         if (error || status === 401 || status === 403) {
             enqueueSnackbar(
                 data?.data?.message || "Unauthorized access. Logging out...",
-                { variant: 'error' }
+                { variant: "error" }
             );
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('role');
-            localStorage.removeItem('username');
-            localStorage.removeItem('location');
-            navigate('/login');
         } else {
-            enqueueSnackbar(data?.data?.message, {
-                variant: 'success',
+            enqueueSnackbar(data?.data?.message || "Logout successful", {
+                variant: "success",
             });
-            localStorage.removeItem('authToken')
-            localStorage.removeItem('role')
-            localStorage.removeItem('username')
-            localStorage.removeItem('location')
-            navigate('/login')
         }
+
+        // ✅ Clear session and redirect either way
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("role");
+        localStorage.removeItem("username");
+        localStorage.removeItem("location");
+        navigate("/login");
     }
 
     async function DBLocation() {
@@ -115,7 +112,7 @@ export default function Header() {
                                     variant="ghost"
                                     className="cursor-pointer w-full"
                                     size="icon"
-                                    onClick={()=>setDbModal(true)}
+                                    onClick={() => setDbModal(true)}
                                 >
                                     <DatabaseZap
                                         className={`w-full ${!dbPath ? 'text-red-500' : 'text-green-500'}`}
@@ -146,23 +143,15 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-            {/* <LocationDialogBox
+            <LocationDialogBox
                 open={LocationModal}
                 setOpen={setLocationModal}
                 selectedLocation={locations?.[0]}
                 setSelectedLocation={setSelectedLocation}
                 setRefetch={setRefetch}
             />
-            
-            */}
 
-            <SchoolLocationDialogBox 
-             open={LocationModal}
-                setOpen={setLocationModal}
-                selectedLocation={locations?.[0]}
-                setSelectedLocation={setSelectedLocation}
-                setRefetch={setRefetch}
-            />
+
 
             <DBLocationModal
                 open={dbModal}

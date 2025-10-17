@@ -1,105 +1,76 @@
-import { Search } from "lucide-react"
+import { Edit, Search, Trash, Trash2 } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import useFetchData from "../../hooks/useFetchData"
 import { useHandleDelete } from "../../hooks/useHandleDelete"
-import { Box, Button, InputAdornment, Snackbar, Stack, TextField, IconButton } from "@mui/material"
+import { Box, InputAdornment, Snackbar, TextField, IconButton } from "@mui/material"
 import { useSnackbar } from "notistack"
 import CommonDataGrid from "@/components/common/CustomDatagrid";
 import StudentFormModal from "@/components/StudentForm";
-
-const rows = [
-    { id: 1, name: "Arjun Kumar", rollNo: "S001", class: "10A", age: 15, contact: "9876543210" },
-    { id: 2, name: "Priya Sharma", rollNo: "S002", class: "10B", age: 14, contact: "9876543211" },
-    { id: 3, name: "Ravi Singh", rollNo: "S003", class: "9A", age: 13, contact: "9876543212" },
-];
-
-const columns = [
-    { field: "id", headerName: "S.NO", flex: 0.5 },
-    { field: "name", headerName: "Student Name", flex: 1 },
-    { field: "rollNo", headerName: "Roll No", flex: 1 },
-    { field: "class", headerName: "Class", flex: 1 },
-    { field: "age", headerName: "Age", flex: 1 },
-    { field: "contact", headerName: "Contact No", flex: 1 },
-    {
-        field: "actions",
-        headerName: "Actions",
-         flex: 1,
-        sortable: false,
-        renderCell: (params) => (
-            <Stack direction="row" spacing={1} >
-                <Button
-                    variant="outlined"
-                    size="small"
-                    color="primary"
-                    onClick={() => alert(`View ${params.row.name}`)}
-                >
-                    View
-                </Button>
-                <Button
-                    variant="outlined"
-                    size="small"
-                    color="error"
-                    onClick={() => alert(`Delete ${params.row.name}`)}
-                >
-                    Delete
-                </Button>
-            </Stack>
-        ),
-    },
-];
+import { Button } from "../../components/ui/button";
 
 function InMateManageMent() {
     const { enqueueSnackbar } = useSnackbar();
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedInmate, setSelectedInmate] = useState(null);
     const [refetch, setRefetch] = useState(0)
     const [searchItem, setSearchItem] = useState();
-    const [openAlert, setOpenAlert] = useState({ showAlert: false, message: '', bgColor: '' })
+    const [openAlert, setOpenAlert] = useState({ showAlert: false, message: '', bgColor: '' });
+    const { data: studentsData } = useFetchData("student");
 
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [order, setOrder] = useState("desc");
-    const [orderBy, setOrderBy] = useState("inmateId");
+
+    const columns = [
+        { field: "serial", headerName: "S.NO", flex: 0.5 },
+        { field: "registration_number", headerName: "Register Number", flex: 1 },
+        { field: "student_name", headerName: "Student Name", flex: 1 },
+        { field: "class_info", headerName: "Class", flex: 1 },
+        { field: "deposite_amount", headerName: "Deposit Amount", flex: 1 },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            sortable: false,
+            renderCell: (params) => (
+                <div className="flex justify-center items-center h-full gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => {
+                            setIsFormOpen(true);
+                        }}
+                    >
+                        <Edit className="w-4 h-4 text-gray-600" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => {
+                            deleteItem(params.row?._id)
+                        }}
+                    >
+                        <Trash2 className="w-4 h-4 text-gray-600" />
+                    </Button>
+                </div>
+            ),
+        },
+    ];
+
     const [searchValue, setSearchValue] = useState("");
 
     const handleChange = (e) => {
         setSearchValue(e.target.value);
-        if (onSearch) onSearch(e.target.value); // Optional: pass value to parent
     };
 
     const handleClear = () => {
         setSearchValue("");
-        if (onSearch) onSearch("");
     };
 
     const url = React.useMemo(() => {
         if (searchItem) {
-            return `inmate/search?query=${searchItem}&page=${page + 1}&limit=${rowsPerPage}`;
+            return `inmate/search?query=${searchItem}`;
         }
-        return `inmate?sortField=${orderBy}&sortOrder=${order}&page=${page + 1}&limit=${rowsPerPage}`;
-    }, [searchItem, page, rowsPerPage, order, orderBy]);
-
-    const { data, error } = useFetchData(url, refetch, "logs");
-    const handleRequestSort = (property) => {
-        const isAsc = orderBy === property && order === "asc";
-        setOrder(isAsc ? "dsc" : "asc");
-        setOrderBy(property);
-    };
-
-    const handleChangePage = (
-        event,
-        newPage,
-    ) => {
-        setPage(newPage);
-        setRefetch(refetch + 1)
-    };
-
-    const handleChangeRowsPerPage = (
-        event,
-    ) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setRefetch(refetch + 1)
-    };
+        return `inmate`;
+    }, [searchItem]);
 
     async function deleteItem(id) {
         const { data, error } = await useHandleDelete(`inmate/${id}`);
@@ -114,11 +85,6 @@ function InMateManageMent() {
             setTimeout(() => setRefetch((prev) => prev + 1), 200);
         }
     }
-
-    const handleAdd = () => {
-        setSelectedInmate(null);
-        setIsFormOpen(true);
-    };
 
     useEffect(() => {
         setTimeout(() => setOpenAlert({ showAlert: false, message: '', bgColor: '' }), 5000)
@@ -153,14 +119,14 @@ function InMateManageMent() {
                             <p className="text-gray-600">Manage Student profiles and demographics</p>
                         </div>
                         <h1 className="text-xl flex items-center font-semibold h-[40px] text-blue-600 bg-blue-100 px-3 py-1 rounded-md shadow-sm">
-                            Total Student: {rows.length || 0}
+                            Total Student: {studentsData?.length || 0}
                         </h1>
                     </div>
-                    <StudentFormModal />
+                    <StudentFormModal open={isFormOpen} onClose={() => setIsFormOpen(false)} setOpen={setIsFormOpen} />
 
                 </div>
 
-                <div className="flex flex-col w-full md:w-[50%] md:flex-row md:items-center justify-between mb-4 space-y-4 md:space-y-0 md:space-x-4">
+                <div className="flex flex-col w-full md:w-[30rem] md:flex-row md:items-center justify-between mb-4 space-y-4 md:space-y-0 md:space-x-4">
                     {/* Search Bar */}
                     <TextField
                         value={searchValue}
@@ -188,8 +154,17 @@ function InMateManageMent() {
 
 
                 {/* Table */}
-
-                <CommonDataGrid rows={rows} columns={columns} />;
+                <CommonDataGrid rows={
+                    studentsData?.map((item, index) => ({
+                        id: item._id,
+                        serial: index + 1,
+                        ...item,
+                        class_info: item.class_info?.class_name
+                            ? `${item.class_info.class_name}-${item.class_info.section}`
+                            : "",
+                    })) || []
+                }
+                    columns={columns} />
             </div>
         </div >
     )
