@@ -10,13 +10,14 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Camera, Trash } from "lucide-react";
+import { Camera, Heading1, Trash } from "lucide-react";
 import { useSnackbar } from "notistack";
 import { Button } from "@/components/ui/button";
 import { usePostData } from "@/hooks/usePostData";
 import useFetchData from "../hooks/useFetchData";
 import FaceRecognition from "./faceidcomponent/FaceId";
 import { uploadFileApi } from "@/hooks/useFileImgUpload";
+import DummyProfile from "@/assets/dummy.png";
 
 const style = {
   position: "absolute",
@@ -48,6 +49,7 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
           ? `${BASE_URL}${selectedStudent.pro_pic.file_url.replace(/\\/g, "/")}`
           : null
       );
+      formik.setFieldValue("deposite_amount", 0);
       formik.setFieldValue(
         "date_of_birth",
         selectedStudent?.date_of_birth
@@ -123,7 +125,7 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
       formData.append("pro_pic", file);
 
       try {
-        const { data: uploadRes, error: uploadErr } = await uploadFileApi(formData,selectedStudent?.pro_pic?._id ? selectedStudent?.pro_pic?._id : null );
+        const { data: uploadRes, error: uploadErr } = await uploadFileApi(formData, selectedStudent?.pro_pic?._id ? selectedStudent?.pro_pic?._id : null);
 
         if (uploadErr) {
           enqueueSnackbar(`Profile upload failed: ${uploadErr}`, { variant: "error" });
@@ -185,16 +187,13 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
           <form onSubmit={formik.handleSubmit}>
             {/* Profile Upload */}
             <Box mt={2} textAlign="center">
-              {profilePreview ? (
-                <Avatar
-                  src={profilePreview}
-                  alt="Profile Preview"
-                  sx={{ width: 80, height: 80, margin: "auto", mb: 1 }}
-                />
-              ) : (
-                <Avatar sx={{ width: 80, height: 80, margin: "auto", mb: 1 }}>?</Avatar>
-              )}
-              <MuiButton variant="outlined" component="label" >
+              <Avatar
+                src={profilePreview || DummyProfile}
+                alt="Profile Preview"
+                sx={{ width: 80, height: 80, margin: "auto", mb: 1 }}
+              />
+
+              <MuiButton variant="outlined" component="label">
                 Upload Profile
                 <input
                   hidden
@@ -203,6 +202,7 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
                   onChange={handleProfileChange}
                 />
               </MuiButton>
+
               {formik.touched.pro_pic && formik.errors.pro_pic && (
                 <Typography color="error" variant="caption" display="block">
                   {formik.errors.pro_pic}
@@ -210,6 +210,7 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
               )}
             </Box>
 
+            {selectedStudent && <h1 className="py-2">{selectedStudent?.student_name} Current Balance: <span className="text-green-500 font-bold">{selectedStudent?.deposite_amount}</span></h1>}
             {/* Form Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
               <TextField
@@ -349,6 +350,11 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
                 onChange={formik.handleChange}
                 error={formik.touched.deposite_amount && Boolean(formik.errors.deposite_amount)}
                 helperText={formik.touched.deposite_amount && formik.errors.deposite_amount}
+                onFocus={(e) => {
+                  if (formik.values.deposite_amount === 0 || formik.values.deposite_amount === "0") {
+                    e.target.select(); // selects the whole value (the 0)
+                  }
+                }}
               />
 
               <TextField

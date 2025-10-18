@@ -94,7 +94,7 @@ function TransactionHistory() {
                                 <TableHead className="font-semibold">Student ID</TableHead>
                                 <TableHead className="font-semibold">Items Purchased</TableHead>
                                 <TableHead className="font-semibold">Categories</TableHead>
-                                <TableHead className="font-semibold">Total Amount</TableHead>
+                                <TableHead className="font-semibold">Transfer Amount</TableHead>
                                 <TableHead className="font-semibold">Date</TableHead>
                                 <TableHead className="font-semibold">Source</TableHead>
                                 <TableHead className="font-semibold">Status</TableHead>
@@ -109,7 +109,7 @@ function TransactionHistory() {
                                     return (
                                         <TableRow key={transaction._id} className="hover:bg-gray-50">
                                             <TableCell className="font-medium">
-                                                {transaction.inmateId || '-'} - <span className="text-red-400">{transaction.custodyType}</span>
+                                                {transaction.depositName || '-'} - <span className="text-red-400">{transaction.custodyType}</span>
                                             </TableCell>
                                             <TableCell className="max-w-xs">
                                                 {transaction?.products && (

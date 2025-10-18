@@ -406,7 +406,7 @@ function Reports() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
+                            {/* <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
                                 <div className="flex-1">
                                     <p className="text-sm text-gray-600 mb-1">Monthly Wages Paid</p>
                                     <p className="text-xl md:text-2xl font-bold text-gray-900">{quickStatistics?.monthlyWagesPaid}</p>
@@ -414,7 +414,7 @@ function Reports() {
                                 <div className={`p-2 rounded-lg bg-blue-50 flex-shrink-0 ml-3`}>
                                     <ReceiptIndianRupee className={`h-5 w-5 md:h-6 md:w-6 text-blue-600`} />
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
                                 <div className="flex-1">
