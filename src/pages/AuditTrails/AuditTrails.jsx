@@ -45,7 +45,7 @@ function AuditTrails() {
                                 <TableHead className="font-semibold w-1/6">Target Model</TableHead>
                                 <TableHead className="font-semibold w-1/6">Description</TableHead>
                                 <TableHead className="font-semibold w-1/6">Actions</TableHead>
-                                <TableHead className="font-semibold w-1/6">Inmate ID</TableHead>
+                                <TableHead className="font-semibold w-1/6">Student ID</TableHead>
                                 <TableHead className="font-semibold w-1/6">Status</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -58,7 +58,7 @@ function AuditTrails() {
                                         <TableCell>{inmate?.description || '-'}</TableCell>
                                         <TableCell>{inmate?.action || '-'}</TableCell>
                                         <TableCell className="font-medium">
-                                            {inmate?.changes?.inmateId || '-'}{" "}
+                                            {inmate?.changes?.student?.registration_number || '-'}{" "}
                                             {inmate?.changes?.custodyType && (
                                                 <>
                                                     - <span className="text-red-400">{inmate.changes.custodyType}</span>

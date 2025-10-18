@@ -62,16 +62,6 @@ function TuckShopPos() {
         refetch
     );
 
-    // ---------------- debug logs ----------------
-    // useEffect(() => {
-    //     console.log("tuckShopItems:", tuckShopItems);
-    //     console.log("tuckShopError:", tuckShopError);
-    //     console.log("inmateList:", inmateList);
-    //     console.log("inmateError:", inmateError);
-    //     console.log("purchases:", purchases);
-    //     console.log("purchasesError:", purchasesError);
-    // }, [tuckShopItems, tuckShopError, inmateList, inmateError, purchases, purchasesError]);
-
     // ---------------- available items filter ----------------
     useEffect(() => {
         const filteredData = (tuckShopItems || []).filter(item => item?.status !== "inactive")
@@ -185,7 +175,7 @@ function TuckShopPos() {
             setCartItems([])
             setIsFormOpen(false);
             // refresh selected inmate balance
-            handleInmateBalance(payload?.inmateId || selectedInmateItem?._id)
+            handleInmateBalance(payload?.deposite_amount || selectedInmateItem?._id)
         }
     }
 
@@ -193,7 +183,7 @@ function TuckShopPos() {
         try {
             const targetId = id ? id : selectedInmateItem?._id;
             if (!targetId) return;
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}inmate/${targetId}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}student/${targetId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSelectedInmateItem(response?.data?.data);
@@ -213,7 +203,7 @@ function TuckShopPos() {
         if (purchases && Array.isArray(purchases)) {
             setFilteredPurchases(
                 purchases.filter((p) =>
-                    String(p.inmateId || "").toLowerCase().includes(purchaseSearch.toLowerCase())
+                    String(p.registration_number || "").toLowerCase().includes(purchaseSearch.toLowerCase())
                 )
             );
         } else {
@@ -293,7 +283,7 @@ function TuckShopPos() {
                         ) : filteredPurchases?.length > 0 ? filteredPurchases.map((p) => (
                             <div key={p._id} className="flex justify-between items-center border-b py-2">
                                 <div>
-                                    <p className="font-semibold">Student: {p.inmateId}</p>
+                                    <p className="font-semibold">Student: {p.registration_number}</p>
                                     <p className="text-sm text-gray-500">
                                         {p.products?.map(prod =>
                                             `${prod.productId?.itemName} x${prod.quantity}`
@@ -357,7 +347,7 @@ function TuckShopPos() {
                                     <p className="text-red-400">Custody: {selectedInmateItem?.custodyType}</p>
                                 )}
                                 {selectedInmateItem && (
-                                    <p className="text-green-500">Balance: ₹{selectedInmateItem?.balance}</p>
+                                    <p className="text-green-500">Balance: ₹{selectedInmateItem?.deposite_amount}</p>
                                 )}
                             </div>
 
@@ -415,12 +405,12 @@ function TuckShopPos() {
                                     <span className="text-xl font-bold text-green-600">₹{total.toFixed(2)}</span>
                                 </div>
 
-                                {selectedInmateItem?.balance >= total && total > 0 && (
+                                {selectedInmateItem?.deposite_amount >= total && total > 0 && (
                                     <Button
                                         className="w-full bg-green-500 hover:bg-green-600 text-white py-3"
                                         onClick={() => {
                                             const values = {
-                                                inmateId: selectedInmateItem?.inmateId,
+                                                studentId: selectedInmateItem?._id,
                                                 totalAmount: total,
                                                 products: productsPayload
                                             }
@@ -450,7 +440,7 @@ function TuckShopPos() {
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="pl-10 border border-[#3498db]"
-                                    />
+                                    /> 
                                 </div>
 
                                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
