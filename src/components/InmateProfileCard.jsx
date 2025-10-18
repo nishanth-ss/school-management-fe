@@ -2,7 +2,7 @@ import React from "react";
 import { User } from "lucide-react";
 
 const InmateProfileCard = ({ inmate }) => {
-    if (!inmate) return <div>No Inmate Data</div>;
+    if (!inmate) return <div>No Student Data</div>;
 
     return (
         <div className="w-4xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-4 border">
@@ -17,7 +17,7 @@ const InmateProfileCard = ({ inmate }) => {
 
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 pt-8">
                 <div className="text-xl">
-                    <strong>Inmate ID:</strong> {inmate.inmateId}
+                    <strong>Student ID:</strong> {inmate.inmateId}
                 </div>
                 <div className="text-xl">
                     <strong>Custody Type:</strong>{" "}

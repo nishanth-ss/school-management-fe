@@ -271,6 +271,7 @@ function UserManagement() {
                                                 <SelectContent className="mt-1 border border-blue-500">
                                                     <SelectItem value={"ADMIN"}>{"ADMIN"}</SelectItem>
                                                     <SelectItem value={"POS"}>{"POS"}</SelectItem>
+                                                    <SelectItem value={"STUDENT"}>{"STUDENT"}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             {errors.role && touched.role && (
