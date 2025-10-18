@@ -1,6 +1,6 @@
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 /**
  * Reusable MUI DataGrid component
@@ -12,18 +12,23 @@ export default function CommonDataGrid({
   height = 450,
   width = "100%",
   rowsPerPageOptions = [5, 10, 25, 50],
+  totalRecords, // total number of rows
+  onPageChange,
+  onPageSizeChange,
+  page = 0,
 }) {
   return (
     <Box sx={{ height: height, width: width }}>
       <DataGrid
         rows={rows}
         columns={columns}
-        pageSizeOptions={rowsPerPageOptions} // ✅ correct prop name
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: pageSize, page: 0 }, // ✅ default to 10 per page
-          },
-        }}
+        pageSizeOptions={rowsPerPageOptions}
+        pagination
+        paginationMode="server" // use "client" if all rows are loaded
+        rowCount={totalRecords || rows.length}
+        page={page}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
         disableRowSelectionOnClick
         disableColumnSelection
         sx={{
@@ -41,3 +46,4 @@ export default function CommonDataGrid({
     </Box>
   );
 }
+

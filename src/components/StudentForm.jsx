@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button as MuiButton,
@@ -14,13 +14,16 @@ import { Camera, Trash } from "lucide-react";
 import { useSnackbar } from "notistack";
 import { Button } from "@/components/ui/button";
 import { usePostData } from "@/hooks/usePostData";
+import useFetchData from "../hooks/useFetchData";
+import FaceRecognition from "./faceidcomponent/FaceId";
+import { uploadFileApi } from "@/hooks/useFileImgUpload";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 600,
+  width: 700,
   bgcolor: "background.paper",
   borderRadius: 2,
   boxShadow: 24,
@@ -29,10 +32,30 @@ const style = {
   overflowY: "scroll",
 };
 
-export default function StudentFormModal({ open, onClose, setOpen }) {
+export default function StudentFormModal({ open, onClose, setOpen, onRefetch, selectedStudent, setSelectedStudent }) {
   const [profilePreview, setProfilePreview] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const { data: locations } = useFetchData("location");
+  const [faceIdData, setFaceIdData] = useState(null);
+  const [faceidModalOpen, setFaceidModalOpen] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    if (selectedStudent) {
+      formik.setValues(selectedStudent);
+      setProfilePreview(
+        selectedStudent?.pro_pic?.file_url
+          ? `${BASE_URL}${selectedStudent.pro_pic.file_url.replace(/\\/g, "/")}`
+          : null
+      );
+      formik.setFieldValue(
+        "date_of_birth",
+        selectedStudent?.date_of_birth
+          ? new Date(selectedStudent.date_of_birth).toISOString().split("T")[0]
+          : ""
+      );
+    }
+  }, [selectedStudent]);
 
   const handleClose = () => {
     onClose();
@@ -42,19 +65,19 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
 
   const formik = useFormik({
     initialValues: {
-      register_number: "",
+      registration_number: "",
       student_name: "",
       father_name: "",
       mother_name: "",
-      birth_date: "",
+      date_of_birth: "",
       gender: "",
       birth_place: "",
       nationality: "India",
-      motherTongue: "",
-      bloodGroup: "",
+      mother_tongue: "",
+      blood_group: "",
       religion: "",
-      profile: null,
       deposite_amount: "",
+      contact_number: "",
       class_info: {
         class_name: "",
         section: "",
@@ -62,16 +85,19 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
       },
     },
     validationSchema: Yup.object({
-      register_number: Yup.string().required("Register number is required"),
+      registration_number: Yup.string().required("Registration number is required"),
       student_name: Yup.string().required("Student name is required"),
       father_name: Yup.string().required("Father name is required"),
       mother_name: Yup.string().required("Mother name is required"),
-      birth_date: Yup.string().required("Birth date is required"),
+      date_of_birth: Yup.string().required("Birth date is required"),
       gender: Yup.string().required("Gender is required"),
       birth_place: Yup.string().required("Birth place is required"),
       nationality: Yup.string().required("Nationality is required"),
+      mother_tongue: Yup.string().required("Mother tongue is required"),
+      blood_group: Yup.string().required("Blood group is required"),
+      religion: Yup.string().required("Religion is required"),
       deposite_amount: Yup.number().required("Deposit amount is required"),
-      profile: Yup.mixed().required("Profile image is required"),
+      contact_number: Yup.string().required("Contact number is required"),
       class_info: Yup.object().shape({
         class_name: Yup.string().required("Class name is required"),
         section: Yup.string().required("Section is required"),
@@ -79,30 +105,70 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
       }),
     }),
     onSubmit: (values) => {
-     onSubmit(values)
+      postData(values)
     },
   });
 
-  const handleProfileChange = (event) => {
+  const handleProfileChange = async (event) => {
     const file = event.currentTarget.files[0];
-    formik.setFieldValue("profile", file);
 
     if (file) {
+      // Preview image
       const reader = new FileReader();
       reader.onload = () => setProfilePreview(reader.result);
       reader.readAsDataURL(file);
+
+      // Upload immediately
+      const formData = new FormData();
+      formData.append("pro_pic", file);
+
+      try {
+        const { data: uploadRes, error: uploadErr } = await uploadFileApi(formData,selectedStudent?.pro_pic?._id ? selectedStudent?.pro_pic?._id : null );
+
+        if (uploadErr) {
+          enqueueSnackbar(`Profile upload failed: ${uploadErr}`, { variant: "error" });
+        } else {
+          enqueueSnackbar("Profile picture uploaded successfully!", { variant: "success" });
+          formik.setFieldValue("pro_pic", uploadRes?.data?.[0]?._id ?? uploadRes?.data?._id);
+        }
+      } catch (uploadError) {
+        enqueueSnackbar(`Upload error: ${uploadError.message}`, { variant: "error" });
+      }
     }
   };
 
-  const onSubmit = (values) => {
-   const {data, error} = usePostData("student", values);
-   if(error){
-    enqueueSnackbar(data?.data?.message, { variant: "error" });
-   }else{
-    enqueueSnackbar(data?.data?.message, { variant: "success" });
-    handleClose();
-   }
-  };
+  async function postData(payLoad) {
+    const isEdit = !!selectedStudent;
+    const url = isEdit ? `student/${selectedStudent._id}` : `student/create`;
+    const method = isEdit ? "put" : "post";
+
+    const customPayload = {
+      ...payLoad,
+      pro_pic: payLoad.pro_pic || "",
+      location_id: locations?.[0]?._id,
+      descriptor: faceIdData ? faceIdData : payLoad?.descriptor?.length > 0 ? payLoad?.descriptor : null
+    };
+
+    const { data, error } = await usePostData(url, customPayload, method);
+
+    if (error) {
+      if (error.status === 401 || error.status === 403) {
+        enqueueSnackbar(error.message, { variant: 'error' });
+        localStorage.clear();
+        navigate("/login");
+      } else {
+        enqueueSnackbar(error?.message, { variant: 'error' });
+      }
+    } else {
+      // ✅ Close modal and reset
+      enqueueSnackbar(data?.message, { variant: 'success' });
+      onClose();                // closes modal via parent
+      formik.resetForm();       // clears form
+      setProfilePreview(null);  // clears image preview
+      setFaceidModalOpen(false); // close faceid modal if open
+      onRefetch();
+    }
+  }
 
   return (
     <Box>
@@ -128,13 +194,18 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
               ) : (
                 <Avatar sx={{ width: 80, height: 80, margin: "auto", mb: 1 }}>?</Avatar>
               )}
-              <Button variant="outlined" component="label">
+              <MuiButton variant="outlined" component="label" >
                 Upload Profile
-                <input hidden accept="image/*" type="file" onChange={handleProfileChange} />
-              </Button>
-              {formik.touched.profile && formik.errors.profile && (
+                <input
+                  hidden
+                  accept="image/*"
+                  type="file"
+                  onChange={handleProfileChange}
+                />
+              </MuiButton>
+              {formik.touched.pro_pic && formik.errors.pro_pic && (
                 <Typography color="error" variant="caption" display="block">
-                  {formik.errors.profile}
+                  {formik.errors.pro_pic}
                 </Typography>
               )}
             </Box>
@@ -211,11 +282,11 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
               <TextField
                 fullWidth
                 label="Birth Place"
-                name="birthPlace"
-                value={formik.values.birthPlace}
+                name="birth_place"
+                value={formik.values.birth_place}
                 onChange={formik.handleChange}
-                error={formik.touched.birthPlace && Boolean(formik.errors.birthPlace)}
-                helperText={formik.touched.birthPlace && formik.errors.birthPlace}
+                error={formik.touched.birth_place && Boolean(formik.errors.birth_place)}
+                helperText={formik.touched.birth_place && formik.errors.birth_place}
               />
 
               <TextField
@@ -231,21 +302,21 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
               <TextField
                 fullWidth
                 label="Mother Tongue"
-                name="motherTongue"
-                value={formik.values.motherTongue}
+                name="mother_tongue"
+                value={formik.values.mother_tongue}
                 onChange={formik.handleChange}
-                error={formik.touched.motherTongue && Boolean(formik.errors.motherTongue)}
-                helperText={formik.touched.motherTongue && formik.errors.motherTongue}
+                error={formik.touched.mother_tongue && Boolean(formik.errors.mother_tongue)}
+                helperText={formik.touched.mother_tongue && formik.errors.mother_tongue}
               />
 
               <TextField
                 fullWidth
                 label="Blood Group"
-                name="bloodGroup"
-                value={formik.values.bloodGroup}
+                name="blood_group"
+                value={formik.values.blood_group}
                 onChange={formik.handleChange}
-                error={formik.touched.bloodGroup && Boolean(formik.errors.bloodGroup)}
-                helperText={formik.touched.bloodGroup && formik.errors.bloodGroup}
+                error={formik.touched.blood_group && Boolean(formik.errors.blood_group)}
+                helperText={formik.touched.blood_group && formik.errors.blood_group}
               />
 
               <TextField
@@ -261,11 +332,11 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
               <TextField
                 fullWidth
                 label="Contact Number"
-                name="contact"
-                value={formik.values.contact}
+                name="contact_number"
+                value={formik.values.contact_number}
                 onChange={formik.handleChange}
-                error={formik.touched.contact && Boolean(formik.errors.contact)}
-                helperText={formik.touched.contact && formik.errors.contact}
+                error={formik.touched.contact_number && Boolean(formik.errors.contact_number)}
+                helperText={formik.touched.contact_number && formik.errors.contact_number}
               />
 
               <TextField
@@ -279,6 +350,37 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
                 error={formik.touched.deposite_amount && Boolean(formik.errors.deposite_amount)}
                 helperText={formik.touched.deposite_amount && formik.errors.deposite_amount}
               />
+
+              <TextField
+                fullWidth
+                label="Class Name"
+                name="class_info.class_name"
+                value={formik.values.class_info.class_name}
+                onChange={formik.handleChange}
+                error={formik.touched.class_info?.class_name && Boolean(formik.errors.class_info?.class_name)}
+                helperText={formik.touched.class_info?.class_name && formik.errors.class_info?.class_name}
+              />
+
+              <TextField
+                fullWidth
+                label="Section"
+                name="class_info.section"
+                value={formik.values.class_info.section}
+                onChange={formik.handleChange}
+                error={formik.touched.class_info?.section && Boolean(formik.errors.class_info?.section)}
+                helperText={formik.touched.class_info?.section && formik.errors.class_info?.section}
+              />
+
+              <TextField
+                fullWidth
+                label="Academic Year"
+                name="class_info.academic_year"
+                value={formik.values.class_info.academic_year}
+                onChange={formik.handleChange}
+                error={formik.touched.class_info?.academic_year && Boolean(formik.errors.class_info?.academic_year)}
+                helperText={formik.touched.class_info?.academic_year && formik.errors.class_info?.academic_year}
+              />
+
             </div>
 
             {/* Face ID and Buttons */}
@@ -307,6 +409,10 @@ export default function StudentFormModal({ open, onClose, setOpen }) {
           </form>
         </Box>
       </Modal>
+
+      {faceidModalOpen && (
+        <FaceRecognition mode="register" open={faceidModalOpen} setOpen={setFaceidModalOpen} faceIdData={faceIdData} setFaceIdData={setFaceIdData} />
+      )}
     </Box>
   );
 }

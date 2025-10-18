@@ -7,15 +7,27 @@ import { useSnackbar } from "notistack"
 import CommonDataGrid from "@/components/common/CustomDatagrid";
 import StudentFormModal from "@/components/StudentForm";
 import { Button } from "../../components/ui/button";
+import { Clear } from "@mui/icons-material"
+import { useDebounce } from "@/utilis/useDebounce"
 
 function InMateManageMent() {
     const { enqueueSnackbar } = useSnackbar();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [refetch, setRefetch] = useState(0)
     const [searchItem, setSearchItem] = useState();
+    const [searchValue, setSearchValue] = useState("");
+    const debouncedSearchValue = useDebounce(searchValue, 500);
     const [openAlert, setOpenAlert] = useState({ showAlert: false, message: '', bgColor: '' });
-    const { data: studentsData } = useFetchData("student");
-
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const { data: students } = useFetchData(
+        `student?search=${debouncedSearchValue || ""}&page=${page + 1}&limit=${rowsPerPage}`,
+        refetch,
+        "true"
+    );
+    const studentsData = students?.data;
+    const totalRecords = students?.totalItems || 0;
 
     const columns = [
         { field: "serial", headerName: "S.NO", flex: 0.5 },
@@ -36,6 +48,7 @@ function InMateManageMent() {
                         className="h-8 w-8 p-0"
                         onClick={() => {
                             setIsFormOpen(true);
+                            setSelectedStudent(studentsData?.find((item) => item._id === params.row._id))
                         }}
                     >
                         <Edit className="w-4 h-4 text-gray-600" />
@@ -55,22 +68,21 @@ function InMateManageMent() {
         },
     ];
 
-    const [searchValue, setSearchValue] = useState("");
-
     const handleChange = (e) => {
-        setSearchValue(e.target.value);
+        setSearchValue(e.target.value); // debounced value updates API after 500ms
     };
 
     const handleClear = () => {
-        setSearchValue("");
+        setSearchValue(""); // triggers API to fetch all data
+        setPage(0);
     };
 
     const url = React.useMemo(() => {
-        if (searchItem) {
-            return `inmate/search?query=${searchItem}`;
+        if (debouncedSearchValue) {
+            return `student/search?query=${debouncedSearchValue}&page=${page + 1}&limit=${rowsPerPage}`;
         }
-        return `inmate`;
-    }, [searchItem]);
+        return `student?page=${page + 1}&limit=${rowsPerPage}`;
+    }, [debouncedSearchValue]);
 
     async function deleteItem(id) {
         const { data, error } = await useHandleDelete(`inmate/${id}`);
@@ -88,7 +100,9 @@ function InMateManageMent() {
 
     useEffect(() => {
         setTimeout(() => setOpenAlert({ showAlert: false, message: '', bgColor: '' }), 5000)
-    }, [refetch, openAlert])
+    }, [refetch, openAlert]);
+
+    const handleRefetch = () => setRefetch(prev => prev + 1);
 
     return (
 
@@ -119,11 +133,17 @@ function InMateManageMent() {
                             <p className="text-gray-600">Manage Student profiles and demographics</p>
                         </div>
                         <h1 className="text-xl flex items-center font-semibold h-[40px] text-blue-600 bg-blue-100 px-3 py-1 rounded-md shadow-sm">
-                            Total Student: {studentsData?.length || 0}
+                            Total Student: {totalRecords || 0}
                         </h1>
                     </div>
-                    <StudentFormModal open={isFormOpen} onClose={() => setIsFormOpen(false)} setOpen={setIsFormOpen} />
-
+                    <StudentFormModal
+                        open={isFormOpen}
+                        onClose={() => { setIsFormOpen(false), setSelectedStudent(null) }}
+                        setOpen={setIsFormOpen}
+                        onRefetch={handleRefetch}
+                        selectedStudent={selectedStudent}
+                        setSelectedStudent={setSelectedStudent}
+                    />
                 </div>
 
                 <div className="flex flex-col w-full md:w-[30rem] md:flex-row md:items-center justify-between mb-4 space-y-4 md:space-y-0 md:space-x-4">
@@ -154,17 +174,25 @@ function InMateManageMent() {
 
 
                 {/* Table */}
-                <CommonDataGrid rows={
-                    studentsData?.map((item, index) => ({
+                <CommonDataGrid
+                    rows={Array.isArray(studentsData) ? studentsData?.map((item, index) => ({
                         id: item._id,
                         serial: index + 1,
                         ...item,
                         class_info: item.class_info?.class_name
                             ? `${item.class_info.class_name}-${item.class_info.section}`
                             : "",
-                    })) || []
-                }
-                    columns={columns} />
+                    })) || [] : []}
+                    columns={columns}
+                    totalRecords={totalRecords || 0}
+                    page={page}
+                    onPageChange={(newPage) => setPage(newPage)}
+                    onPageSizeChange={(newSize) => {
+                        setRowsPerPage(newSize);
+                        setPage(0); // reset to first page when pageSize changes
+                    }}
+                    pageSize={rowsPerPage}
+                />
             </div>
         </div >
     )

@@ -52,7 +52,7 @@ function TuckShopPos() {
 
     // ---------------- useFetchData (match your original endpoints) ----------------
     const { data: tuckShopItems, error: tuckShopError } = useFetchData("tuck-shop", refetch);
-    const { data: inmateList, error: inmateError } = useFetchData("inmate", refetch, null, true);
+    const { data: inmateList, error: inmateError } = useFetchData("student", refetch, null, true);
     // ---------- IMPORTANT: fetch purchases from pos-shop-cart (backend route) ----------
     const { data: purchases, error: purchasesError } = useFetchData("pos-shop-cart", refetch);
 
@@ -339,12 +339,12 @@ function TuckShopPos() {
                                 value={selectedInmateItem || null}
                                 getOptionLabel={(option) =>
                                     option
-                                        ? `${option.firstName} ${option.lastName} - ${option.inmateId}${option.is_blocked === "true" ? " (Blocked)" : ""}`
+                                        ? `${option.student_name} ${option.father_name} - ${option.registration_number}${option.is_blocked === "true" ? " (Blocked)" : ""}`
                                         : ""
                                 }
                                 onChange={(event, newValue) => {
                                     setSelectedInmateItem(newValue);
-                                    selectedInmateIdRef.current = newValue?.inmateId || null;
+                                    selectedInmateIdRef.current = newValue?.registration_number || null;
                                 }}
                                 renderInput={(params) => (
                                     <TextField {...params} size="small" label="Select student" fullWidth />
