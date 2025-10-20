@@ -11,7 +11,7 @@ export default function FaceRecognition({ mode = 'register', open, setOpen, setF
   const { enqueueSnackbar } = useSnackbar();
 
   const detectionOptions = new faceapi.TinyFaceDetectorOptions({
-    inputSize: 608,
+    inputSize: 512,
     scoreThreshold: 0.4,
   });
 

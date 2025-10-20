@@ -73,11 +73,11 @@ function TuckShopPos() {
         if (faceidData) {
             const fetchData = async () => {
                 try {
-                    const { data, error } = await usePostData(`inmate/fetch-by-face`, { descriptor: faceidData });
+                    const { data, error } = await usePostData(`student/fetch-by-face`, { descriptor: faceidData });
                     if (data) {
-                        selectedInmateIdRef.current = data?.data?.data?._id;
-                        setSelectedInmateItem(data?.data?.data);
-                        handleInmateBalance(data?.data?.data?._id)
+                        selectedInmateIdRef.current = data?.data?._id;
+                        setSelectedInmateItem(data?.data);
+                        handleInmateBalance(data?.data?._id)
                     }
                     if (error) {
                         console.error("Error fetching student by face:", error);

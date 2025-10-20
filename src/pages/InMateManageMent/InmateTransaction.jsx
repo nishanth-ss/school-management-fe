@@ -64,14 +64,13 @@ function InmateTransaction() {
     }
 
     const userName = localStorage.getItem('username');
-    const { data, error } = useFetchData(`inmate/inmate-transaction/${userName}?page=${page + 1}&limit=${rowsPerPage}`, refetch, "true");
-
+    const { data, error } = useFetchData(`student/student-transaction/${userName}?page=${page + 1}&limit=${rowsPerPage}`, refetch, "true");
     return (
         <div className="border rounded-lg overflow-hidden m-10 w-full">
             <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50">
-                                <TableHead className="font-semibold">Inmate ID</TableHead>
+                                <TableHead className="font-semibold">Student ID</TableHead>
                                 <TableHead className="font-semibold">Transaction</TableHead>
                                 <TableHead className="font-semibold">Categories</TableHead>
                                 <TableHead className="font-semibold">Total Amount</TableHead>
@@ -89,7 +88,7 @@ function InmateTransaction() {
                                     return (
                                         <TableRow key={transaction._id} className="hover:bg-gray-50">
                                             <TableCell className="font-medium">
-                                                {transaction.inmateId || '-'} - <span className="text-red-400">{transaction.custodyType}</span>
+                                                {data?.student?.name || '-'} - <span className="text-red-400">{data?.student?.registration_number}</span>
                                             </TableCell>
                                             <TableCell className="max-w-xs">
                                                 {transaction?.products && (

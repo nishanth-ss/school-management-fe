@@ -49,7 +49,6 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
           ? `${BASE_URL}${selectedStudent.pro_pic.file_url.replace(/\\/g, "/")}`
           : null
       );
-      formik.setFieldValue("deposite_amount", 0);
       formik.setFieldValue(
         "date_of_birth",
         selectedStudent?.date_of_birth
@@ -78,7 +77,6 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
       mother_tongue: "",
       blood_group: "",
       religion: "",
-      deposite_amount: "",
       contact_number: "",
       class_info: {
         class_name: "",
@@ -98,7 +96,6 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
       mother_tongue: Yup.string().required("Mother tongue is required"),
       blood_group: Yup.string().required("Blood group is required"),
       religion: Yup.string().required("Religion is required"),
-      deposite_amount: Yup.number().required("Deposit amount is required"),
       contact_number: Yup.string().required("Contact number is required"),
       class_info: Yup.object().shape({
         class_name: Yup.string().required("Class name is required"),
@@ -338,23 +335,6 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
                 onChange={formik.handleChange}
                 error={formik.touched.contact_number && Boolean(formik.errors.contact_number)}
                 helperText={formik.touched.contact_number && formik.errors.contact_number}
-              />
-
-              <TextField
-                fullWidth
-                label="Deposit Amount (₹)"
-                name="deposite_amount"
-                type="number"
-                onWheel={(e) => e.target.blur()}
-                value={formik.values.deposite_amount}
-                onChange={formik.handleChange}
-                error={formik.touched.deposite_amount && Boolean(formik.errors.deposite_amount)}
-                helperText={formik.touched.deposite_amount && formik.errors.deposite_amount}
-                onFocus={(e) => {
-                  if (formik.values.deposite_amount === 0 || formik.values.deposite_amount === "0") {
-                    e.target.select(); // selects the whole value (the 0)
-                  }
-                }}
               />
 
               <TextField
