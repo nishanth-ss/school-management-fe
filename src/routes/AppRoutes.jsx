@@ -17,6 +17,7 @@ import InmateTransaction from '../pages/InMateManageMent/InmateTransaction';
 import Inventory from '../pages/Inventory/inventory';
 import FeesManagement from '@/pages/FeesManagement/FeesManagement';
 import UserManagement from '@/pages/UserManagement/UserManagement';
+import FinancialManagement from '@/pages/FinancialManagement/FinancialManagement';
 
 export default function AppRoutes() {
 
@@ -34,7 +35,7 @@ export default function AppRoutes() {
                     {/* <Route path="/fees-management" element={<FeesManagement />} /> */}
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/reports" element={<Reports />} />
-                    {/* <Route path="/financial-management" element={<FinancialManagement />} /> */}
+                    <Route path="/financial-management" element={<FinancialManagement />} />
                     
                     <Route path="/transaction-history" element={<TransactionHistory />} />
                     <Route path="/audit-trails" element={<AuditTrails />} />
@@ -50,7 +51,7 @@ export default function AppRoutes() {
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["STUDENT", "student"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/student-profile" element={<InmateProfile />} />
                     <Route path="/student-transaction" element={<InmateTransaction />} />

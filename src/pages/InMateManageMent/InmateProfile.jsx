@@ -5,11 +5,11 @@ import useFetchData from '@/hooks/useFetchData'
 function InmateProfile() {
 
     const userName = localStorage.getItem('username');
-    const {data,error} = useFetchData(`inmate/inmateid/${userName}`);
+    const {data,error} = useFetchData(`student/profile/${userName}`);
     
     return (
         <div className='w-full p-20'>
-            <InmateProfileCard inmate={data?.[0]}/>
+            <InmateProfileCard inmate={data}/>
         </div>
     )
 }

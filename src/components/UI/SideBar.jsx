@@ -22,7 +22,7 @@ function SideBar() {
         { title: "Student Management", icon: Users, path: '/student-management', roles: ["ADMIN"] },
         // { title: "Fees Management", icon: ReceiptIndianRupee, path: '/fees-management', roles: ["ADMIN"] },
         // { title: "Canteen Management", icon: Store, path: '/canteen-management', roles: ["ADMIN"] },
-        // { title: "Financial Management", icon: ReceiptIndianRupee, path: '/financial-management', roles: ["ADMIN"] },
+        { title: "Canteen Deposit", icon: ReceiptIndianRupee, path: '/financial-management', roles: ["ADMIN"] },
         { title: "Transaction History", icon: ArrowLeftRight, path: '/transaction-history', roles: ["ADMIN"] },
         { title: "Canteen POS", icon: Store, path: '/tuck-shop-pos', roles: ["ADMIN", "POS"] },
         { title: "Reports", icon: FileText, path: '/reports', roles: ["ADMIN"] },
@@ -31,8 +31,8 @@ function SideBar() {
         { title: "User Management", icon: UserRoundPen, path: '/user-management', roles: ["ADMIN"] },
         { title: "Inventory", icon: ShoppingBag, path: '/inventory', roles: ["ADMIN"] },
         { title: "Audit Trails", icon: ShieldCheck, path: '/audit-trails', roles: ["ADMIN"] },
-        { title: "Student Profile", icon: Users, path: '/student-profile', roles: ["STUDENT"] },
-        { title: "Student Transaction", icon: ArrowLeftRight, path: '/student-transaction', roles: ["STUDENT"] },
+        { title: "Student Profile", icon: Users, path: '/student-profile', roles: ["STUDENT", "student"] },
+        { title: "Student Transaction", icon: ArrowLeftRight, path: '/student-transaction', roles: ["STUDENT", "student"] },
     ];
 
     const pathName = useLocation();

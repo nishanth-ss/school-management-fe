@@ -17,32 +17,45 @@ const InmateProfileCard = ({ inmate }) => {
 
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 pt-8">
                 <div className="text-xl">
-                    <strong>Student ID:</strong> {inmate.inmateId}
+                    <strong>Student Name:</strong> {inmate.student_name}
                 </div>
                 <div className="text-xl">
-                    <strong>Custody Type:</strong>{" "}
-                    <span className="text-red-500">{inmate.custodyType}</span>
+                    <strong>Father Name:</strong> {inmate.father_name}
                 </div>
                 <div className="text-xl">
-                    <strong>Cell Number:</strong> {inmate.cellNumber}
+                    <strong>Mother Name:</strong> {inmate.mother_name}
                 </div>
                 <div className="text-xl">
-                    <strong>Balance:</strong> ₹{inmate.balance}
+                    <strong>Registration Number:</strong> {inmate.registration_number}
+                </div>
+
+                <div className="text-xl">
+                    <strong>Birth Place:</strong>{" "}
+                    <span>{inmate.birth_place}</span>
                 </div>
                 <div className="text-xl">
                     <strong>Date of Birth:</strong>{" "}
-                    {new Date(inmate.dateOfBirth).toLocaleDateString()}
+                    {new Date(inmate.date_of_birth).toLocaleDateString()}
                 </div>
                 <div className="text-xl">
-                    <strong>Admission Date:</strong>{" "}
-                    {new Date(inmate.admissionDate).toLocaleDateString()}
+                    <strong>Gender:</strong> {inmate.gender}
                 </div>
                 <div className="text-xl">
-                    <strong>Crime Type:</strong> {inmate.crimeType}
+                    <strong>Balance:</strong> ₹{inmate.deposite_amount}
+                </div>
+                <div className="text-xl">
+                    <strong>Nationality:</strong>{" "}
+                    {inmate.nationality}
+                </div>
+                <div className="text-xl">
+                    <strong>Religion:</strong> {inmate.religion}
+                </div>
+                <div className="text-xl">
+                    <strong>Mother Tongue:</strong> {inmate.mother_tongue}
                 </div>
                 <div className="text-xl">
                     <strong>Status:</strong>{" "}
-                    <span className="text-blue-600">{inmate.status}</span>
+                    <span className="text-blue-600">{inmate.contact_number}</span>
                 </div>
                 {/* <div className="text-xl">
                     <strong>Created At:</strong>{" "}

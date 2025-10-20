@@ -27,7 +27,16 @@ function FinancialManagement() {
     const { data } = useFetchData("department");
     const locationRaw = localStorage.getItem("location");
     const location = locationRaw ? JSON.parse(locationRaw) : null;
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const { data: students } = useFetchData(
+        `student`,
+        refetch,
+        "true",
+        true
+    );
 
+    const studentsData = students?.data;
 
     const { data: inmateData, error: inmateError } = useFetchData(
         inmateIdSearch ? `inmate/search?query=${inmateIdSearch}` : null,
@@ -35,9 +44,11 @@ function FinancialManagement() {
     );
 
     const { data: dailyWagesInmateData, error: dailyWagesInmateError } = useFetchData(
-        dailyWagesInmateIdSearch ? `inmate/search?query=${dailyWagesInmateIdSearch}` : null,
+        dailyWagesInmateIdSearch ? `student/${dailyWagesInmateIdSearch}` : null,
         refetch
     );
+
+    console.log(dailyWagesInmateData)
 
     useEffect(() => {
         setSelectedInmate(inmateData)
@@ -90,8 +101,7 @@ function FinancialManagement() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Daily Wage Entry */}
-                    <Card className="bg-white shadow-sm">
-
+                    {/* <Card className="bg-white shadow-sm">
                         <CardHeader className="flex items-center justify-between ">
                             <CardTitle className="text-xl font-semibold text-gray-900">
                                 Daily Wage Entry
@@ -104,7 +114,7 @@ function FinancialManagement() {
                                     <p className="text-red-400"> Custody Type: {selectedInmate ? selectedInmate[0]?.custodyType : ''}</p>
                                 </div>
                             }
-                        </CardHeader>
+                        </CardHeader> 
 
                         <Formik
                             initialValues={{
@@ -136,7 +146,6 @@ function FinancialManagement() {
                             {({ values, handleChange, setFieldValue, handleSubmit, errors, touched }) => (
                                 <Form onSubmit={handleSubmit}>
                                     <CardContent className="space-y-5">
-                                        {/* Inmate ID */}
                                         <div>
                                             <Label htmlFor="inmateId" className="text-sm font-medium text-gray-700">
                                                 Inmate ID
@@ -159,7 +168,6 @@ function FinancialManagement() {
                                             )}
                                         </div>
 
-                                        {/* Work Assignment */}
                                         <div>
                                             <Label htmlFor="workAssignId" className="text-sm font-medium text-gray-700">
                                                 Work Assignment
@@ -227,7 +235,6 @@ function FinancialManagement() {
                                             )}
                                         </div>
 
-                                        {/* Wage Amount */}
                                         <div>
                                             <Label htmlFor="wageAmount" className="text-sm font-medium text-gray-700">
                                                 Wage Amount
@@ -256,7 +263,7 @@ function FinancialManagement() {
                                 </Form>
                             )}
                         </Formik>
-                    </Card>
+                    </Card> */}
 
 
                     {/* Family Deposit Processing */}
@@ -267,119 +274,169 @@ function FinancialManagement() {
                             </CardTitle>
 
                             {
-                                (dailyWagesInmateData?.length == 1 && showDeposit) &&
+                                (dailyWagesInmateData?.deposite_amount && showDeposit) &&
                                 <div className="text-sm font-medium text-green-700 text-right">
-                                    <p>Inmate ID: {dailyWagesInmateData ? dailyWagesInmateData[0]?.inmateId : ''}</p>
-                                    <p>Balance: ₹{dailyWagesInmateData ? dailyWagesInmateData[0]?.balance : ''}</p>
-                                    <p className="text-red-400">Custody Type: {dailyWagesInmateData ? dailyWagesInmateData[0]?.custodyType : ''}</p>
+                                    <p>Balance: ₹{dailyWagesInmateData?.deposite_amount}</p>
                                 </div>
                             }
                         </CardHeader>
-
                         <Formik
                             initialValues={{
-                                inmateId: "",
+                                student_id: "",
                                 depositType: "",
-                                relationShipId: "",
                                 depositAmount: "",
+                                relationShipId: "",
+                                depositedBy: "",
+                                depositedByType: "",
+                                contactNumber: "",
+                                remarks: "",
+                                status: "completed",
+                                type: "deposit",
                             }}
                             validationSchema={Yup.object({
-                                inmateId: Yup.string().required("Inmate ID is required"),
+                                student_id: Yup.string().required("Student ID is required"),
                                 depositType: Yup.string().required("Deposit Type is required"),
                                 relationShipId: Yup.string().required("Relationship is required"),
-                                depositAmount: Yup.number().required("Deposit amount is required").positive(),
+                                depositAmount: Yup.number()
+                                    .required("Deposit amount is required")
+                                    .positive("Amount must be positive"),
+                                depositedBy: Yup.string().required("Deposited By is required"),
+                                depositedByType: Yup.string().required("Deposited By Type is required"),
+                                contactNumber: Yup.string()
+                                    .matches(/^[0-9]{10}$/, "Must be a valid 10-digit number")
+                                    .required("Contact Number is required"),
+                                remarks: Yup.string().required("Remarks are required"),
                             })}
                             onSubmit={(values, { resetForm }) => {
-                                let updateData = {
-                                    "type": "deposit", "status": "ACTIVE", ...values
-                                }
-                                postWagesData(updateData, "financial/create")
+                                const updateData = {
+                                    ...values,
+                                    status: "completed",
+                                    type: "deposit",
+                                };
+                                postWagesData(updateData, "financial/create");
                                 resetForm();
-                                setDailyWagesInmate([])
+                                setDailyWagesInmate([]);
                                 setShowDeposit(false);
                             }}
                         >
                             {({ values, handleChange, handleSubmit, errors, touched, setFieldValue }) => (
                                 <Form onSubmit={handleSubmit}>
                                     <CardContent className="space-y-5">
-                                        {/* Inmate ID */}
+
+                                        {/* Student ID */}
                                         <div>
-                                            <Label htmlFor="inmateId" className="text-sm font-medium text-gray-700">
-                                                Inmate ID
-                                            </Label>
-                                            <Input
-                                                id="inmateId"
-                                                name="inmateId"
-                                                placeholder="Enter inmate ID"
-                                                value={values.inmateId}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setDailyWagesInmateIdSearch(e.target.value);
-                                                    setShowDeposit(true)
-                                                    setRefetch(refetch + 1)
+                                            <Label htmlFor="student_id">Student ID</Label>
+                                            <Select
+                                                onValueChange={(value) => {
+                                                    setFieldValue("student_id", value);
+                                                    setDailyWagesInmateIdSearch(value);
+                                                    setShowDeposit(true);
+                                                    setRefetch(refetch + 1);
                                                 }}
-                                                className="mt-1"
-                                            />
-                                            {errors.inmateId && touched.inmateId && (
-                                                <p className="text-sm text-red-600 mt-1">{errors.inmateId}</p>
+                                                value={values.student_id}
+                                            >
+                                                <SelectTrigger id="student_id" className="w-full">
+                                                    <SelectValue placeholder="Select Student ID" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {/* Example items — replace with your dynamic list */}
+                                                    {studentsData?.map((student) => (
+                                                        <SelectItem key={student._id} value={student._id}>
+                                                            {student.student_name} - {student.registration_number}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+
+                                            {errors.student_id && touched.student_id && (
+                                                <p className="text-sm text-red-600 mt-1">{errors.student_id}</p>
                                             )}
                                         </div>
 
+
+                                        {/* Deposited By */}
                                         <div>
-                                            <Label htmlFor="depositType" className="text-sm font-medium text-gray-700">
-                                                Deposit Type
-                                            </Label>
+                                            <Label htmlFor="depositedBy">Deposited By</Label>
+                                            <Input
+                                                id="depositedBy"
+                                                name="depositedBy"
+                                                placeholder="Enter depositor's name"
+                                                value={values.depositedBy}
+                                                onChange={handleChange}
+                                            />
+                                            {errors.depositedBy && touched.depositedBy && (
+                                                <p className="text-sm text-red-600">{errors.depositedBy}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Deposited By Type */}
+                                        <div>
+                                            <Label htmlFor="depositedByType">Deposited By Type</Label>
+                                            <Select
+                                                onValueChange={(value) => setFieldValue("depositedByType", value)}
+                                                value={values.depositedByType}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select Type" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="OUTSIDER">Outsider</SelectItem>
+                                                    <SelectItem value="INSIDER">Insider</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.depositedByType && touched.depositedByType && (
+                                                <p className="text-sm text-red-600">{errors.depositedByType}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Deposit Type */}
+                                        <div>
+                                            <Label htmlFor="depositType">Deposit Type</Label>
                                             <Select
                                                 onValueChange={(value) => setFieldValue("depositType", value)}
                                                 value={values.depositType}
                                             >
-                                                <SelectTrigger className="mt-1 w-full">
-                                                    <SelectValue placeholder="Select Type" />
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select Deposit Type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="Admission">Admission</SelectItem>
-                                                    <SelectItem value="Mulakath">Mulakath</SelectItem>
-                                                    <SelectItem value="Court/Custody">Court/Custody</SelectItem>
-                                                    <SelectItem value="Money Order">Money Order</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectItem value="cash">Cash</SelectItem>
+                                                    <SelectItem value="cheque">Cheque</SelectItem>
+                                                    <SelectItem value="online">Online</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             {errors.depositType && touched.depositType && (
-                                                <p className="text-sm text-red-600 mt-1">{errors.depositType}</p>
+                                                <p className="text-sm text-red-600">{errors.depositType}</p>
                                             )}
                                         </div>
 
+                                        {/* Relationship */}
                                         <div>
-                                            <Label htmlFor="relationShipId" className="text-sm font-medium text-gray-700">
-                                                Relationship
-                                            </Label>
+                                            <Label htmlFor="relationShipId">Relationship</Label>
                                             <Select
                                                 onValueChange={(value) => setFieldValue("relationShipId", value)}
                                                 value={values.relationShipId}
                                             >
-                                                <SelectTrigger className="mt-1 w-full">
+                                                <SelectTrigger className="w-full">
                                                     <SelectValue placeholder="Select Relationship" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="self">Self</SelectItem>
-                                                    <SelectItem value="spouse">Spouse</SelectItem>
-                                                    <SelectItem value="parent">Parent</SelectItem>
-                                                    <SelectItem value="child">Child</SelectItem>
+                                                    <SelectItem value="mother">Mother</SelectItem>
+                                                    <SelectItem value="father">Father</SelectItem>
                                                     <SelectItem value="sibling">Sibling</SelectItem>
+                                                    <SelectItem value="spouse">Spouse</SelectItem>
                                                     <SelectItem value="friend">Friend</SelectItem>
                                                     <SelectItem value="other">Other</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             {errors.relationShipId && touched.relationShipId && (
-                                                <p className="text-sm text-red-600 mt-1">{errors.relationShipId}</p>
+                                                <p className="text-sm text-red-600">{errors.relationShipId}</p>
                                             )}
                                         </div>
 
                                         {/* Deposit Amount */}
                                         <div>
-                                            <Label htmlFor="depositAmount" className="text-sm font-medium text-gray-700">
-                                                Deposit Amount
-                                            </Label>
+                                            <Label htmlFor="depositAmount">Deposit Amount</Label>
                                             <Input
                                                 id="depositAmount"
                                                 name="depositAmount"
@@ -387,16 +444,49 @@ function FinancialManagement() {
                                                 step="0.01"
                                                 value={values.depositAmount}
                                                 onChange={handleChange}
-                                                className="mt-1"
-                                                placeholder="Enter Deposit Amount"
                                                 onWheel={(e) => e.target.blur()}
+                                                placeholder="Enter deposit amount"
                                             />
                                             {errors.depositAmount && touched.depositAmount && (
-                                                <p className="text-sm text-red-600 mt-1">{errors.depositAmount}</p>
+                                                <p className="text-sm text-red-600">{errors.depositAmount}</p>
                                             )}
                                         </div>
 
-                                        <Button type="submit" className="w-[93%] bg-green-600 hover:bg-green-700 text-white mt-4 absolute bottom-6">
+                                        {/* Contact Number */}
+                                        <div>
+                                            <Label htmlFor="contactNumber">Contact Number</Label>
+                                            <Input
+                                                id="contactNumber"
+                                                name="contactNumber"
+                                                placeholder="Enter contact number"
+                                                value={values.contactNumber}
+                                                onChange={handleChange}
+                                            />
+                                            {errors.contactNumber && touched.contactNumber && (
+                                                <p className="text-sm text-red-600">{errors.contactNumber}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Remarks */}
+                                        <div>
+                                            <Label htmlFor="remarks">Remarks</Label>
+                                            <Input
+                                                id="remarks"
+                                                name="remarks"
+                                                placeholder="Enter remarks"
+                                                value={values.remarks}
+                                                onChange={handleChange}
+                                            />
+                                            {errors.remarks && touched.remarks && (
+                                                <p className="text-sm text-red-600">{errors.remarks}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Submit */}
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-green-600 hover:bg-green-700 text-white mt-4"
+                                        >
                                             <CreditCard className="w-4 h-4 mr-2" />
                                             Process Deposit
                                         </Button>
@@ -404,9 +494,10 @@ function FinancialManagement() {
                                 </Form>
                             )}
                         </Formik>
+
                     </Card>
                     {/* Withdrawal Processing */}
-                    <Card className="bg-white shadow-sm">
+                    {/* <Card className="bg-white shadow-sm">
                         <CardHeader className="flex items-center justify-between w-full">
                             <CardTitle className="text-xl font-semibold text-gray-900">
                                 Withdrawal Entry
@@ -424,13 +515,13 @@ function FinancialManagement() {
 
                         <Formik
                             initialValues={{
-                                inmateId: "",
+                                student_id: "",
                                 depositType: "",
                                 relationShipId: "",
                                 depositAmount: "",
                             }}
                             validationSchema={Yup.object({
-                                inmateId: Yup.string().required("Inmate ID is required"),
+                                student_id: Yup.string().required("Student ID is required"),
                                 depositType: Yup.string().required("Withdrawal Type is required"),
                                 relationShipId: Yup.string().required("Relationship is required"),
                                 depositAmount: Yup.number().required("Deposit amount is required").positive(),
@@ -449,16 +540,16 @@ function FinancialManagement() {
                             {({ values, handleChange, handleSubmit, errors, touched, setFieldValue }) => (
                                 <Form onSubmit={handleSubmit}>
                                     <CardContent className="space-y-5">
-                                        {/* Inmate ID */}
+                                     
                                         <div>
-                                            <Label htmlFor="inmateId" className="text-sm font-medium text-gray-700">
-                                                Inmate ID
+                                            <Label htmlFor="student_id" className="text-sm font-medium text-gray-700">
+                                                Student ID
                                             </Label>
                                             <Input
-                                                id="inmateId"
-                                                name="inmateId"
-                                                placeholder="Enter inmate ID"
-                                                value={values.inmateId}
+                                                id="student_id"
+                                                name="student_id"
+                                                placeholder="Enter student ID"
+                                                value={values.student_id}
                                                 onChange={(e) => {
                                                     handleChange(e);
                                                     setDailyWagesInmateIdSearch(e.target.value);
@@ -467,8 +558,8 @@ function FinancialManagement() {
                                                 }}
                                                 className="mt-1"
                                             />
-                                            {errors.inmateId && touched.inmateId && (
-                                                <p className="text-sm text-red-600 mt-1">{errors.inmateId}</p>
+                                            {errors.student_id && touched.student_id && (
+                                                <p className="text-sm text-red-600 mt-1">{errors.student_id}</p>
                                             )}
                                         </div>
 
@@ -521,7 +612,7 @@ function FinancialManagement() {
                                             )}
                                         </div>
 
-                                        {/* Deposit Amount */}
+                                    
                                         <div>
                                             <Label htmlFor="depositAmount" className="text-sm font-medium text-gray-700">
                                                 Withdrawal Amount
@@ -551,7 +642,7 @@ function FinancialManagement() {
                                 </Form>
                             )}
                         </Formik>
-                    </Card>
+                    </Card> */}
                 </div>
             </div>
         </div>
