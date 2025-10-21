@@ -109,7 +109,7 @@ function TransactionHistory() {
                                     return (
                                         <TableRow key={transaction._id} className="hover:bg-gray-50">
                                             <TableCell className="font-medium">
-                                                {transaction.depositName || '-'} - <span className="text-red-400">{transaction.custodyType}</span>
+                                                {transaction?.student_id?.student_name || '-'} - <span className="text-red-400">{transaction?.student_id?.registration_number}</span>
                                             </TableCell>
                                             <TableCell className="max-w-xs">
                                                 {transaction?.products && (
