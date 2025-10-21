@@ -327,6 +327,7 @@ function TuckShopPos() {
                             <Autocomplete
                                 options={inmateList || []}
                                 value={selectedInmateItem || null}
+                                disabled={true}
                                 getOptionLabel={(option) =>
                                     option
                                         ? `${option.student_name} ${option.father_name} - ${option.registration_number}${option.is_blocked === "true" ? " (Blocked)" : ""}`

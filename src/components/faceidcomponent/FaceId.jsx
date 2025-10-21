@@ -119,19 +119,23 @@ export default function FaceRecognition({ mode = 'register', open, setOpen, setF
   };
 
   const captureFace = async (descriptorFromLoop) => {
-    const detections = descriptorFromLoop
-      ? { descriptor: descriptorFromLoop }
-      : await faceapi
-          .detectSingleFace(videoRef.current, detectionOptions)
-          .withFaceLandmarks()
-          .withFaceDescriptor();
+    const detections = await faceapi
+      .detectAllFaces(videoRef.current, detectionOptions)
+      .withFaceLandmarks()
+      .withFaceDescriptors();
 
-    if (!detections) {
+    if (!detections || detections.length === 0) {
       enqueueSnackbar('No face detected. Try again.', { variant: 'warning' });
       return;
     }
 
-    const descriptorArray = Array.from(detections.descriptor);
+    if (detections.length > 1) {
+      enqueueSnackbar('Multiple faces detected. Please ensure only one face is visible.', { variant: 'warning' });
+      return;
+    }
+
+    const descriptorArray = Array.from(detections[0].descriptor);
+
 
     if (descriptorArray) {
       setFaceIdData(descriptorArray);

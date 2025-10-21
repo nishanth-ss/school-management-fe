@@ -28,7 +28,7 @@ export default function BulkOperations() {
 
         const apiUrl =
             activeTab === 'bulk-add-students'
-                ? `${import.meta.env.VITE_API_URL}inmate/download-csv/${location?._id}`
+                ? `${import.meta.env.VITE_API_URL}student/download-csv/${location?._id}`
                 : `${import.meta.env.VITE_API_URL}financial/wages/download-csv/${location?._id}`;
 
         const fileName =
@@ -87,21 +87,20 @@ export default function BulkOperations() {
             return;
         }
         const formData = new FormData();
-        formData.append('location', location?._id);
+        formData.append('location_id', location?._id);
         formData.append('file', file);
 
         try {
-            const response = await usePostData("bulk-oprations/inmates", formData);
+            const response = await usePostData("bulk-oprations/students", formData);
 
             const { data: payload, error } = response || {};
 
             if (error || !payload?.success) {
                 enqueueSnackbar("Upload failed.", { variant: 'error' });
             } else {
-                const { created = [], updated = [], failed = [] } = payload.results || {};
-                enqueueSnackbar(`Upload successful. Created: ${created.length}, Updated: ${updated.length}, Failed: ${failed.length}`, { variant: 'success' });
-                if (failed.length > 0) {
-                    console.warn("Failed records:", failed);
+                enqueueSnackbar(`Upload successful. Created: ${payload?.summary?.created}, skipped: ${payload?.summary?.skipped}, Failed: ${payload?.summary?.failed}`, { variant: 'success' });
+                if (payload?.summary?.failed > 0) {
+                    console.warn("Failed records:", payload?.summary?.failed);
                 }
             }
         } catch (err) {
