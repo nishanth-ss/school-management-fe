@@ -177,7 +177,7 @@ function DashBoard() {
                                                 </span>
 
                                                 {/* Reverse Button */}
-                                                {transaction.type === "POS" && !transaction?.details?.isReversed && (
+                                                {transaction.type === "POS" && !transaction?.details?.is_reversed && (
                                                     <button
                                                         onClick={() => handleReverse(transaction)}
                                                         className="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
@@ -185,7 +185,7 @@ function DashBoard() {
                                                         Reverse
                                                     </button>
                                                 )}
-                                                {transaction.type === "POS" && transaction?.details?.isReversed && (
+                                                {transaction.type === "POS" && transaction?.details?.is_reversed && (
                                                     <span className="ml-2 px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded">
                                                         Reversed
                                                     </span>

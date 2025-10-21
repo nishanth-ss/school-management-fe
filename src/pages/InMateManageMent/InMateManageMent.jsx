@@ -21,7 +21,7 @@ function InMateManageMent() {
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const { data: students } = useFetchData(
+    const { data: students, error } = useFetchData(
         `student?search=${debouncedSearchValue || ""}&page=${page + 1}&limit=${rowsPerPage}`,
         refetch,
         "true"
@@ -175,21 +175,23 @@ function InMateManageMent() {
 
                 {/* Table */}
                 <CommonDataGrid
-                    rows={Array.isArray(studentsData) ? studentsData?.map((item, index) => ({
-                        id: item._id,
-                        serial: index + 1,
-                        ...item,
-                        class_info: item.class_info?.class_name
-                            ? `${item.class_info.class_name}-${item.class_info.section}`
-                            : "",
-                    })) || [] : []}
+                    rows={Array.isArray(studentsData)
+                        ? studentsData.map((item, index) => ({
+                            id: item._id,
+                            serial: page * rowsPerPage + index + 1,
+                            ...item,
+                            class_info: item.class_info?.class_name
+                                ? `${item.class_info.class_name}-${item.class_info.section}`
+                                : "",
+                        }))
+                        : []}
                     columns={columns}
                     totalRecords={totalRecords || 0}
                     page={page}
                     onPageChange={(newPage) => setPage(newPage)}
                     onPageSizeChange={(newSize) => {
                         setRowsPerPage(newSize);
-                        setPage(0); // reset to first page when pageSize changes
+                        setPage(0);
                     }}
                     pageSize={rowsPerPage}
                 />
