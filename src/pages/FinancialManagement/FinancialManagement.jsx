@@ -48,8 +48,6 @@ function FinancialManagement() {
         refetch
     );
 
-    console.log(dailyWagesInmateData)
-
     useEffect(() => {
         setSelectedInmate(inmateData)
     }, [inmateData])
@@ -301,7 +299,6 @@ function FinancialManagement() {
                                     .required("Deposit amount is required")
                                     .positive("Amount must be positive"),
                                 depositedBy: Yup.string().required("Deposited By is required"),
-                                depositedByType: Yup.string().required("Deposited By Type is required"),
                                 contactNumber: Yup.string()
                                     .matches(/^[0-9]{10}$/, "Must be a valid 10-digit number")
                                     .required("Contact Number is required"),
@@ -366,26 +363,6 @@ function FinancialManagement() {
                                             />
                                             {errors.depositedBy && touched.depositedBy && (
                                                 <p className="text-sm text-red-600">{errors.depositedBy}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Deposited By Type */}
-                                        <div>
-                                            <Label htmlFor="depositedByType">Deposited By Type</Label>
-                                            <Select
-                                                onValueChange={(value) => setFieldValue("depositedByType", value)}
-                                                value={values.depositedByType}
-                                            >
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select Type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="OUTSIDER">Outsider</SelectItem>
-                                                    <SelectItem value="INSIDER">Insider</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.depositedByType && touched.depositedByType && (
-                                                <p className="text-sm text-red-600">{errors.depositedByType}</p>
                                             )}
                                         </div>
 

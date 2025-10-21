@@ -154,9 +154,9 @@ function DashBoard() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-medium text-gray-600">
-                                                        {transaction?.details?.inmateId} -{" "}
+                                                        {transaction?.details?.student_id?.student_name} -{" "}
                                                         <span className="text-red-400">
-                                                            {transaction?.details?.custodyType}
+                                                            {transaction?.details?.student_id?.registration_number}
                                                         </span>
                                                     </p>
                                                     <p className="text-sm font-medium text-gray-800">
