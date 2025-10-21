@@ -22,27 +22,21 @@ export default function CommonDataGrid({
       <DataGrid
         rows={rows}
         columns={columns}
+        rowCount={totalRecords}
+        paginationMode="server"
+        paginationModel={{ page, pageSize }}
+        onPaginationModelChange={(model) => {
+          const { page: newPage, pageSize: newSize } = model;
+          if (newPage !== page) onPageChange(newPage);
+          if (newSize !== pageSize) onPageSizeChange(newSize);
+        }}
         pageSizeOptions={rowsPerPageOptions}
-        pagination
-        paginationMode="server" // use "client" if all rows are loaded
-        rowCount={totalRecords || rows.length}
-        page={page}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
         disableRowSelectionOnClick
         disableColumnSelection
-        sx={{
-          border: "1px solid #ddd",
-          borderRadius: 2,
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#f5f5f5",
-            fontWeight: "bold",
-          },
-          "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
-            outline: "none",
-          },
-        }}
       />
+
+
+
     </Box>
   );
 }

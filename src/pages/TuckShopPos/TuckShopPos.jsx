@@ -283,7 +283,7 @@ function TuckShopPos() {
                         ) : filteredPurchases?.length > 0 ? filteredPurchases.map((p) => (
                             <div key={p._id} className="flex justify-between items-center border-b py-2">
                                 <div>
-                                    <p className="font-semibold">Student: {p.registration_number}</p>
+                                    <p className="font-semibold"><span className="text-gray-500">Student:</span> {p.student_id?.student_name} - <span className="text-red-400">{p.student_id?.registration_number}</span></p>
                                     <p className="text-sm text-gray-500">
                                         {p.products?.map(prod =>
                                             `${prod.productId?.itemName} x${prod.quantity}`

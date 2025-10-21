@@ -8,9 +8,10 @@ import { Formik, Form, Field } from "formik"
 import * as Yup from "yup"
 import { usePostData } from "../../hooks/usePostData"
 import { useEffect, useState } from "react"
-import { Box, Snackbar } from "@mui/material"
+import { Box, Snackbar, TextField } from "@mui/material"
 import { useSnackbar } from "notistack"
 import useFetchData from "../../hooks/useFetchData"
+import { useDebounce } from "@/utilis/useDebounce"
 
 
 function FinancialManagement() {
@@ -29,14 +30,27 @@ function FinancialManagement() {
     const location = locationRaw ? JSON.parse(locationRaw) : null;
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const { data: students } = useFetchData(
-        `student`,
+
+    const [studentSearchValue, setStudentSearchValue] = useState("");
+    const debouncedStudentSearchValue = useDebounce(studentSearchValue, 500);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const { data: studentResults, error: studentError } = useFetchData(
+        `student?exactData=${debouncedStudentSearchValue || ""}`,
         refetch,
-        "true",
-        true
+        "true"
     );
 
-    const studentsData = students?.data;
+    const studentsData = studentResults?.data || [];
+
+    useEffect(() => {
+        if(studentResults?.data?.length  === 1){
+            setStudentSearchValue(studentResults?.data[0]?.registration_number)
+            setDailyWagesInmateIdSearch(studentResults?.data[0]?._id)
+            setShowDeposit(true)
+        }
+    }, [studentResults])
+
 
     const { data: inmateData, error: inmateError } = useFetchData(
         inmateIdSearch ? `inmate/search?query=${inmateIdSearch}` : null,
@@ -272,8 +286,9 @@ function FinancialManagement() {
                             </CardTitle>
 
                             {
-                                (dailyWagesInmateData?.deposite_amount && showDeposit) &&
+                                (dailyWagesInmateData?.deposite_amount && showDeposit && studentsData.length > 0) &&
                                 <div className="text-sm font-medium text-green-700 text-right">
+                                    <p>Student Name: {dailyWagesInmateData?.student_name} {dailyWagesInmateData?.father_name}</p>
                                     <p>Balance: ₹{dailyWagesInmateData?.deposite_amount}</p>
                                 </div>
                             }
@@ -309,6 +324,7 @@ function FinancialManagement() {
                                     ...values,
                                     status: "completed",
                                     type: "deposit",
+                                    student_id: studentResults?.data[0]?._id
                                 };
                                 postWagesData(updateData, "financial/create");
                                 resetForm();
@@ -322,34 +338,48 @@ function FinancialManagement() {
 
                                         {/* Student ID */}
                                         <div>
-                                            <Label htmlFor="student_id">Student ID</Label>
-                                            <Select
-                                                onValueChange={(value) => {
-                                                    setFieldValue("student_id", value);
-                                                    setDailyWagesInmateIdSearch(value);
-                                                    setShowDeposit(true);
-                                                    setRefetch(refetch + 1);
+                                            <Label htmlFor="student_search">Student</Label>
+                                            <TextField
+                                                id="student_search"
+                                                placeholder="Search student by ID"
+                                                value={studentSearchValue}
+                                                onChange={(e) => {
+                                                    setStudentSearchValue(e.target.value);
+                                                    setShowSuggestions(true); 
+                                                    setDailyWagesInmate([]);
+                                                    setShowDeposit(false);
                                                 }}
-                                                value={values.student_id}
-                                            >
-                                                <SelectTrigger id="student_id" className="w-full">
-                                                    <SelectValue placeholder="Select Student ID" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {/* Example items — replace with your dynamic list */}
-                                                    {studentsData?.map((student) => (
-                                                        <SelectItem key={student._id} value={student._id}>
+                                                onFocus={() => setShowSuggestions(true)} // show on focus
+                                                fullWidth
+                                                size="small"
+                                                variant="outlined"
+                                            />
+
+                                            {/* {showSuggestions && studentSearchValue && studentsData.length > 0 && (
+                                                <div className="border rounded mt-1 max-h-48 overflow-auto bg-white shadow-sm">
+                                                    {studentsData.map((student) => (
+                                                        <div
+                                                            key={student._id}
+                                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                                            onClick={() => {
+                                                                setFieldValue("student_id", student._id);
+                                                                setStudentSearchValue(student.registration_number); 
+                                                                setDailyWagesInmateIdSearch(student._id);
+                                                                setShowDeposit(true);
+                                                                setRefetch((prev) => prev + 1);
+                                                                setShowSuggestions(false); 
+                                                            }}
+                                                        >
                                                             {student.student_name} - {student.registration_number}
-                                                        </SelectItem>
+                                                        </div>
                                                     ))}
-                                                </SelectContent>
-                                            </Select>
+                                                </div>
+                                            )} */}
 
                                             {errors.student_id && touched.student_id && (
                                                 <p className="text-sm text-red-600 mt-1">{errors.student_id}</p>
                                             )}
                                         </div>
-
 
                                         {/* Deposited By */}
                                         <div>
@@ -401,7 +431,7 @@ function FinancialManagement() {
                                                     <SelectItem value="mother">Mother</SelectItem>
                                                     <SelectItem value="father">Father</SelectItem>
                                                     <SelectItem value="sibling">Sibling</SelectItem>
-                                                    <SelectItem value="spouse">Spouse</SelectItem>
+                                                    <SelectItem value="teacher">Teacher</SelectItem>
                                                     <SelectItem value="friend">Friend</SelectItem>
                                                     <SelectItem value="other">Other</SelectItem>
                                                 </SelectContent>
