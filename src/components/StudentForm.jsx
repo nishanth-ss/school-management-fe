@@ -145,6 +145,7 @@ export default function StudentFormModal({ open, onClose, setOpen, onRefetch, se
       ...payLoad,
       pro_pic: payLoad.pro_pic || "",
       location_id: locations?.[0]?._id,
+      deposite_amount: selectedStudent ? selectedStudent?.deposite_amount : 0,
       descriptor: faceIdData ? faceIdData : payLoad?.descriptor?.length > 0 ? payLoad?.descriptor : null
     };
 
