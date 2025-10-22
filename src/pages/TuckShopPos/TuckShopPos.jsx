@@ -47,6 +47,8 @@ function TuckShopPos() {
     const [selectediInventory, setSelectedInventory] = useState(null);
     const [openFaceId, setOpenFaceId] = useState(false);
     const [faceidData, setFaceIdData] = useState(null);
+    const [studentSearchValue, setStudentSearchValue] = useState("");
+    const debouncedStudentSearchValue = useDebounce(studentSearchValue, 500);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -62,6 +64,15 @@ function TuckShopPos() {
         refetch
     );
 
+    const { data: studentResults, error: studentError } = useFetchData(
+        `student?exactData=${debouncedStudentSearchValue || ""}`,
+        refetch,
+        "true"
+    );
+
+    const findSingleStudent = studentResults?.data?.length === 1;
+    const studentsData = findSingleStudent ? studentResults?.data?.[0] : [];
+
     // ---------------- available items filter ----------------
     useEffect(() => {
         const filteredData = (tuckShopItems || []).filter(item => item?.status !== "inactive")
@@ -76,8 +87,9 @@ function TuckShopPos() {
                     const { data, error } = await usePostData(`student/fetch-by-face`, { descriptor: faceidData });
                     if (data) {
                         selectedInmateIdRef.current = data?.data?._id;
-                        setSelectedInmateItem(data?.data);
-                        handleInmateBalance(data?.data?._id)
+                        // setSelectedInmateItem(data?.data);
+                        setStudentSearchValue(data?.data?.registration_number)
+                        // handleInmateBalance(data?.data?._id)
                     }
                     if (error) {
                         console.error("Error fetching student by face:", error);
@@ -276,7 +288,7 @@ function TuckShopPos() {
                     </CardHeader>
                     <CardContent>
                         {/* show errors clearly so you can debug */}
-                        {purchasesError && filteredPurchases?.length === 0  ? (
+                        {purchasesError && filteredPurchases?.length === 0 ? (
                             <div className="text-red-500">
                                 Error loading purchases: {purchasesError?.message || (purchasesError?.response?.data?.message)}
                             </div>
@@ -299,7 +311,7 @@ function TuckShopPos() {
                                         variant="destructive"
                                         size="sm"
                                         onClick={() => handleReverse(p._id)}
-                                        disabled={p.is_reversed || userRole !== "ADMIN" }
+                                        disabled={p.is_reversed || userRole !== "ADMIN"}
                                     >
                                         Reverse
                                     </Button>
@@ -324,7 +336,7 @@ function TuckShopPos() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {/* Select Inmate */}
-                            <Autocomplete
+                            {/* <Autocomplete
                                 options={inmateList || []}
                                 value={selectedInmateItem || null}
                                 disabled={userRole !== "ADMIN"}
@@ -340,17 +352,38 @@ function TuckShopPos() {
                                 renderInput={(params) => (
                                     <TextField {...params} size="small" label="Select student" fullWidth />
                                 )}
+                            /> */}
+
+                            <div>
+                                <Label htmlFor="student_search">Student</Label>
+                                <TextField
+                                    id="student_search"
+                                    placeholder="Search student by ID"
+                                value={studentSearchValue}
+                                onChange={(e) => {
+                                    setStudentSearchValue(e.target.value);
+                                    setDailyWagesInmate([]);
+                                    setShowDeposit(false);
+                                }}
+                                fullWidth
+                                size="small"
+                                variant="outlined"
                             />
+                           {findSingleStudent && <div className="flex justify-between items-center pt-2">
+                                <p>Student Name: {studentsData?.student_name} {studentsData?.father_name}</p>
+                                <p>Balance:  <span className="text-green-500">₹{studentsData?.deposite_amount}</span></p>
+                            </div>}
+                            </div>
 
                             {/* Balance */}
-                            <div className="flex justify-between">
+                            {/* <div className="flex justify-between">
                                 {selectedInmateItem?.custodyType && (
                                     <p className="text-red-400">Custody: {selectedInmateItem?.custodyType}</p>
                                 )}
                                 {selectedInmateItem && (
                                     <p className="text-green-500">Balance: ₹{selectedInmateItem?.deposite_amount}</p>
                                 )}
-                            </div>
+                            </div> */}
 
                             {/* Cart */}
                             <div>
@@ -406,12 +439,12 @@ function TuckShopPos() {
                                     <span className="text-xl font-bold text-green-600">₹{total.toFixed(2)}</span>
                                 </div>
 
-                                {selectedInmateItem?.deposite_amount >= total && total > 0 && (
+                                {studentsData?.deposite_amount >= total && total > 0 && (
                                     <Button
                                         className="w-full bg-green-500 hover:bg-green-600 text-white py-3"
                                         onClick={() => {
                                             const values = {
-                                                studentId: selectedInmateItem?._id,
+                                                studentId: studentsData?._id,
                                                 totalAmount: total,
                                                 products: productsPayload
                                             }
@@ -441,7 +474,7 @@ function TuckShopPos() {
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="pl-10 border border-[#3498db]"
-                                    /> 
+                                    />
                                 </div>
 
                                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>

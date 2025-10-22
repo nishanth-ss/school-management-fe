@@ -44,9 +44,10 @@ function FinancialManagement() {
     const studentsData = studentResults?.data || [];
 
     useEffect(() => {
-        if(studentResults?.data?.length  === 1){
+        if (studentResults?.data?.length === 1) {
             setStudentSearchValue(studentResults?.data[0]?.registration_number)
             setDailyWagesInmateIdSearch(studentResults?.data[0]?._id)
+
             setShowDeposit(true)
         }
     }, [studentResults])
@@ -307,7 +308,7 @@ function FinancialManagement() {
                                 type: "deposit",
                             }}
                             validationSchema={Yup.object({
-                                student_id: Yup.string().required("Student ID is required"),
+                                student_id: Yup.string().optional(),
                                 depositType: Yup.string().required("Deposit Type is required"),
                                 relationShipId: Yup.string().required("Relationship is required"),
                                 depositAmount: Yup.number()
@@ -324,11 +325,13 @@ function FinancialManagement() {
                                     ...values,
                                     status: "completed",
                                     type: "deposit",
-                                    student_id: studentResults?.data[0]?._id
+                                    student_id: studentResults?.data?.[0]?._id,
                                 };
+
                                 postWagesData(updateData, "financial/create");
                                 resetForm();
                                 setDailyWagesInmate([]);
+                                setStudentSearchValue("");
                                 setShowDeposit(false);
                             }}
                         >
@@ -345,7 +348,7 @@ function FinancialManagement() {
                                                 value={studentSearchValue}
                                                 onChange={(e) => {
                                                     setStudentSearchValue(e.target.value);
-                                                    setShowSuggestions(true); 
+                                                    setShowSuggestions(true);
                                                     setDailyWagesInmate([]);
                                                     setShowDeposit(false);
                                                 }}
