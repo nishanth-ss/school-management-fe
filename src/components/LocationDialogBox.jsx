@@ -44,9 +44,13 @@ export default function LocationDialogBox({
 
   const formik = useFormik({
     initialValues: {
+      schoolName: "",
+      baseUrl: "",
       locationName: "",
     },
     validationSchema: Yup.object({
+      schoolName: Yup.string().required("School name is required"),
+      baseUrl: Yup.string().required("Base URL is required"),
       locationName: Yup.string().required("Location name is required"),
     }),
     onSubmit: async (values) => {
@@ -73,19 +77,21 @@ export default function LocationDialogBox({
         localStorage.setItem("location", JSON.stringify(data?.data));
       }
     },
-  });  
+  });
 
   // ✅ Update form values safely when editing
-useEffect(() => {
-  if (open && selectedLocation) {
-    formik.setValues({
-      locationName: selectedLocation?.locationName || "",
-      custodyLimits: selectedLocation?.custodyLimits?.length
-        ? selectedLocation.custodyLimits
-        : defaultCustodyLimits,
-    });
-  }
-}, [open, selectedLocation]);
+  useEffect(() => {
+    if (open && selectedLocation) {
+      formik.setValues({
+        schoolName: selectedLocation?.schoolName || "",
+        baseUrl: selectedLocation?.baseUrl || "",
+        locationName: selectedLocation?.locationName || "",
+        custodyLimits: selectedLocation?.custodyLimits?.length
+          ? selectedLocation.custodyLimits
+          : defaultCustodyLimits,
+      });
+    }
+  }, [open, selectedLocation]);
 
   const selectedLocationHaveValue =
     Object.keys(selectedLocation ?? {}).length > 0;
@@ -101,6 +107,41 @@ useEffect(() => {
         <form onSubmit={formik.handleSubmit} className="space-y-4">
           {/* Location Name */}
           <div>
+
+            <Label htmlFor="schoolName" className="mb-2">
+              School Name
+            </Label>
+            <Input
+              id="schoolName"
+              name="schoolName"
+              value={formik.values.schoolName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.schoolName &&
+              formik.errors.schoolName && (
+                <p className="text-red-500 text-sm">
+                  {formik.errors.schoolName}
+                </p>
+              )}
+
+            <Label htmlFor="baseUrl" className="mb-2">
+              Base URL
+            </Label>
+            <Input
+              id="baseUrl"
+              name="baseUrl"
+              value={formik.values.baseUrl}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.baseUrl &&
+              formik.errors.baseUrl && (
+                <p className="text-red-500 text-sm">
+                  {formik.errors.baseUrl}
+                </p>
+              )}
+
             <Label htmlFor="locationName" className="mb-2">
               Location Name
             </Label>
