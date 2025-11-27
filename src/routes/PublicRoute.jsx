@@ -5,7 +5,7 @@ export default function PublicRoute({ children }) {
 
   const userRole = localStorage.getItem('role');
 
-  const navigatePath = userRole === "ADMIN" ? "/dashboard" : userRole === "POS" ? "/tuck-shop-pos" : "/student-profile";
+  const navigatePath = userRole === "SUPERADMIN" ? "/super-dashboard" : userRole === "ADMIN" ? "/dashboard" : userRole === "POS" ? "/tuck-shop-pos" : "/student-profile";
 
   if (token) {
     return <Navigate to={navigatePath} replace />;

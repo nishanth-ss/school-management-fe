@@ -10,6 +10,7 @@ import {
     Upload,
     ReceiptIndianRupee,
     BellElectric,
+    Grid,
     ShoppingBag
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import Logo from "../../assets/logo.png"
 
 function SideBar() {
     const sideBarItems = [
+        { title: "Super Dashboard", icon: Grid, path: '/super-dashboard', roles: ["SUPERADMIN"] },
         { title: "Dashboard", icon: LayoutDashboard, path: '/dashboard', roles: ["ADMIN"] },
         { title: "Student Management", icon: Users, path: '/student-management', roles: ["ADMIN"] },
         // { title: "Fees Management", icon: ReceiptIndianRupee, path: '/fees-management', roles: ["ADMIN"] },
