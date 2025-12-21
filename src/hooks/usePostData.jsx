@@ -7,7 +7,7 @@ export async function usePostData(url, payLoad, method = "post") {
             method: method,
             url: `${import.meta.env.VITE_API_URL}${url}`,
             data: payLoad,
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}`,"ngrok-skip-browser-warning": "true" },
         });
 
         // Return only the backend data

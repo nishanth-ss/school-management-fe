@@ -23,7 +23,8 @@ function useFetchData(url, refetch, type, totalRecords = false) {
                 const fullUrl = `${import.meta.env.VITE_API_URL}${url}${query}`;
                 const response = await axios.get(fullUrl, {
                     headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${token}`,
+                        "ngrok-skip-browser-warning": "true"
                     }
                 });
                 setData(type == "true" ? response.data : type == "logs" ? response?.data : response.data?.data);

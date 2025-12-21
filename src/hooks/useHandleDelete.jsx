@@ -7,6 +7,7 @@ export async function useHandleDelete(url) {
         const response = await axios.delete(`${import.meta.env.VITE_API_URL}${url}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                "ngrok-skip-browser-warning": "true"
             },
         });
         return { data: response, error: null };
