@@ -15,7 +15,7 @@ export default function Header() {
     const { enqueueSnackbar } = useSnackbar();
     const userRole = localStorage.getItem("role");
     const username = localStorage.getItem("username");
-    const [LocationModal, setLocationModal] = useState(false)
+    const [LocationModal, setLocationModal] = useState(false);
     const [refetch, setRefetch] = useState(0);
     const { data: locations, error } = useFetchData(`location`, refetch);
     const [selectedLocation, setSelectedLocation] = useState({});

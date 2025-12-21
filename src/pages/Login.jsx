@@ -27,32 +27,41 @@ const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [openFaceId, setOpenFaceId] = useState(false);
-  const [faceidData,setFaceIdData] = useState(null);
+  const [faceidData, setFaceIdData] = useState(null);
 
   useEffect(() => {
     const loginUser = async () => {
       if (!faceidData) return; // Only run if data exists
-  
+
       try {
         const res = await axios.post(
           `${import.meta.env.VITE_API_URL}user/login`,
-          {descriptor:faceidData}
+          { descriptor: faceidData }
         );
-  
+
         localStorage.setItem("authToken", res.data?.token);
         localStorage.setItem("role", res.data?.user?.role);
         localStorage.setItem("username", res.data?.user?.username);
-  
+
         enqueueSnackbar("User Logged In Successfully", { variant: "success" });
-  
+
         if (res.status === 200) {
-          navigate(
-            res.data?.user?.role === "POS"
-              ? "/tuck-shop-pos"
-              : res.data?.user?.role === "STUDENT" || res.data?.user?.role === "student"
-              ? "/student-profile" 
-              : "/dashboard"
-          );
+          const getRedirectPath = (role) => {
+            const path = (() => {
+              switch (role?.toUpperCase()) {
+                case "SUPER ADMIN": return "/super-dashboard";
+                case "ADMIN": return "/dashboard";
+                case "POS": return "/tuck-shop-pos";
+                case "STUDENT": return "/student-profile";
+                default: return "/login";
+              }
+            })();
+            return path.startsWith('/') ? path : `/${path}`;
+          };
+
+          // Then in your login success handler:
+          const userRole = res.data.user.role;
+          navigate(getRedirectPath(userRole));
         }
       } catch (error) {
         enqueueSnackbar(error?.response?.data?.message || "Something went wrong", {
@@ -60,9 +69,9 @@ const Login = () => {
         });
       }
     };
-  
+
     loginUser();
-  }, [faceidData]);  
+  }, [faceidData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-blue-800 flex items-center justify-center p-4">

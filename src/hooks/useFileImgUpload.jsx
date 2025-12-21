@@ -16,6 +16,7 @@ export const uploadFileApi = async (payload, id) => {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true"
       },
     });
 
