@@ -101,7 +101,7 @@ const Login = () => {
                   enqueueSnackbar("User Logined Successfully", {
                     variant: 'success',
                   });
-                  res?.status == 200 ? navigate(res.data?.user?.role == "POS" ? "/tuck-shop-pos" : res.data?.user?.role == "STUDENT" || res.data?.user?.role == "student" ? "/student-profile" : '/dashboard') : null
+                  res?.status == 200 ? navigate(res.data?.user?.role == "POS" ? "/tuck-shop-pos" : res.data?.user?.role == "STUDENT" || res.data?.user?.role == "student" ? "/student-profile" : res?.data?.user?.role === "SUPER ADMIN" ? "/super-dashboard" : '/dashboard') : null
                 })
               } catch (error) {
                 enqueueSnackbar(error?.response?.data?.message || "Something went wrong", {

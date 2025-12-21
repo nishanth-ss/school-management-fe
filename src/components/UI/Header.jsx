@@ -14,15 +14,21 @@ export default function Header() {
 
     const { enqueueSnackbar } = useSnackbar();
     const userRole = localStorage.getItem("role");
+    
     const username = localStorage.getItem("username");
     const [LocationModal, setLocationModal] = useState(false);
     const [refetch, setRefetch] = useState(0);
-    const { data: locations, error } = useFetchData(`location`, refetch);
+    const { data: locations, error } = useFetchData(
+        userRole === 'SUPER ADMIN' ? null : `location`, 
+        userRole === 'SUPER ADMIN' ? 0 : refetch
+    );
     const [selectedLocation, setSelectedLocation] = useState({});
     const [dbPath, setDbPath] = useState(null);
     const [dbModal, setDbModal] = useState(false);
 
     useEffect(() => {
+        if (userRole === 'SUPER ADMIN') return;
+        
         if (locations?.[0]) {
             localStorage.setItem("location", JSON.stringify(locations[0]));
             setSelectedLocation(locations[0]);

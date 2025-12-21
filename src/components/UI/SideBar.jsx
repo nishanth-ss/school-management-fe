@@ -19,7 +19,7 @@ import Logo from "../../assets/logo.png"
 
 function SideBar() {
     const sideBarItems = [
-        { title: "Super Dashboard", icon: Grid, path: '/super-dashboard', roles: ["SUPERADMIN"] },
+        { title: "Super Dashboard", icon: Grid, path: '/super-dashboard', roles: ["SUPER ADMIN"] },
         { title: "Dashboard", icon: LayoutDashboard, path: '/dashboard', roles: ["ADMIN"] },
         { title: "Student Management", icon: Users, path: '/student-management', roles: ["ADMIN"] },
         // { title: "Fees Management", icon: ReceiptIndianRupee, path: '/fees-management', roles: ["ADMIN"] },
@@ -73,7 +73,7 @@ function SideBar() {
                         );
                     })}
                 </ul>
-                <p className="text-[12px] text-gray-500 mt-2">© {new Date().getFullYear()} Allen Group. All rights reserved</p>
+                <p className="text-[12px] text-gray-500 mt-2">© {new Date().getFullYear()} AGS soft solution. All rights reserved</p>
             </div>
         </nav>
     );

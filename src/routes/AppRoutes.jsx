@@ -28,18 +28,21 @@ export default function AppRoutes() {
             <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
-           
+            {/* Super Admin only routes */}
+            <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                <Route element={<MainSection />}>
+                    <Route path="/super-dashboard" element={<SuperAdminDashboard />} />
+                </Route>
+            </Route>
 
             {/* Admin routes */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/dashboard" element={<DashBoard />} />
                     <Route path="/student-management" element={<InMateManageMent />} />
-                    {/* <Route path="/fees-management" element={<FeesManagement />} /> */}
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/financial-management" element={<FinancialManagement />} />
-
                     <Route path="/transaction-history" element={<TransactionHistory />} />
                     <Route path="/audit-trails" element={<AuditTrails />} />
                     <Route path="/bulk-operations" element={<BulkOperations />} />
@@ -58,24 +61,6 @@ export default function AppRoutes() {
                 <Route element={<MainSection />}>
                     <Route path="/student-profile" element={<InmateProfile />} />
                     <Route path="/student-transaction" element={<InmateTransaction />} />
-                </Route>
-            </Route>
-
-             {/* Super Admin Routes */}
-            <Route element={<ProtectedRoute allowedRoles={["SUPERADMIN","ADMIN"]} />}>
-                <Route element={<MainSection />}>
-                    <Route path={"/super-dashboard"} element={<SuperAdminDashboard />} />
-                    <Route path="/dashboard" element={<DashBoard />} />
-                    <Route path="/student-management" element={<InMateManageMent />} />
-                    <Route path="/user-management" element={<UserManagement />} />
-                    <Route path="/reports" element={<Reports />} />
-                    <Route path="/financial-management" element={<FinancialManagement />} />
-
-                    <Route path="/transaction-history" element={<TransactionHistory />} />
-                    <Route path="/audit-trails" element={<AuditTrails />} />
-                    <Route path="/bulk-operations" element={<BulkOperations />} />
-                    <Route path="/department" element={<Department />} />
-                    <Route path="/inventory" element={<Inventory />} />
                 </Route>
             </Route>
 

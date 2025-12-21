@@ -1,15 +1,29 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectedRoutes = ({ allowedRoles }) => {
-    
-  const userRole = localStorage.getItem('role')
-    if (!userRole) {
-        return <Navigate to="/login" replace />;
-    }
+const normalizeRole = (role) =>
+  role?.replace(/\s+/g, "").toUpperCase();
 
-    if (userRole && allowedRoles.includes(userRole)) {
-        return <Outlet />
-    }
-}
+const ProtectedRoute = ({ allowedRoles }) => {
+  const storedRole = localStorage.getItem("role");
 
-export default ProtectedRoutes;
+  if (!storedRole) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const userRole = normalizeRole(storedRole);
+  const normalizedAllowedRoles = allowedRoles.map(normalizeRole);
+
+  const isAllowed = normalizedAllowedRoles.includes(userRole);
+
+  if (!isAllowed) {
+    console.log("Not authorized:", {
+      userRole,
+      allowedRoles: normalizedAllowedRoles,
+    });
+    return <Navigate to="/not-authorized" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default ProtectedRoute;
