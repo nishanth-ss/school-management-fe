@@ -29,7 +29,7 @@ export default function AppRoutes() {
             <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
             {/* Super Admin only routes */}
-            <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["SUPER ADMIN"]} />}>
                 <Route element={<MainSection />}>
                     <Route path="/super-dashboard" element={<SuperAdminDashboard />} />
                 </Route>

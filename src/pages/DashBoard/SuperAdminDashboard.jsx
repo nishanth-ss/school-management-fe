@@ -14,6 +14,8 @@ import React, { useState } from "react";
 import { TablePagination } from "@mui/material";
 import { ArrowBack, ArrowBackIosNew, ArrowBackOutlined } from "@mui/icons-material";
 import { set } from "date-fns";
+import { Edit } from "lucide-react";
+import CampusDialog from "@/components/SuperAdminDialogBox";
 
 // const getSubscriptionColor = (status) => {
 //   switch (status) {
@@ -80,13 +82,16 @@ export default function DashboardStats({
   const [showHistory, setShowHistory] = useState(false);
   const [locationId, setLocationId] = useState(null);
   const [studentID, setStudentID] = useState(null);
-  const [studentData, setStudentData] = useState(null);
+  const [open,setOpen] = useState(false);
+  const [getCampusDetails,setCampusDetails] = useState(null);
+   const [refetch, setRefetch] = useState(null)
+
   const { data } = useFetchData(
     `api/subscribers/locations/stats?page=${page + 1}&limit=${rowsPerPage}`,
-    null,
+    refetch,
     "logs"
   );
-  const statsValue = data?.data || [];
+   let statsValue = data?.data || [];
   const statsPagination = data?.pagination || {};
 
   const { data: locationData } = useFetchData(
@@ -106,8 +111,12 @@ export default function DashboardStats({
     null,
     "logs"
   );
-
   const summaryInfo = data?.summary;
+
+  const handleClose = ()=>{
+    setOpen(false);
+    setCampusDetails(null);
+  }
 
   return (
     <section className="p-6 w-full">
@@ -250,8 +259,8 @@ export default function DashboardStats({
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${item.payment_status === "SUCCESS"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                         }`}
                     >
                       {item.payment_status}
@@ -389,6 +398,7 @@ export default function DashboardStats({
                   <TableCell>Name</TableCell>
                   <TableCell>Location</TableCell>
                   <TableCell>Base URL</TableCell>
+                  <TableCell>Subscription Amount</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -401,7 +411,13 @@ export default function DashboardStats({
                     <TableCell className="max-w-xs truncate">
                       {item.baseUrl}
                     </TableCell>
-                    <TableCell><Button variant="outlined" color="success" onClick={() => setLocationId(item._id)}>View School</Button></TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {item.amount}
+                    </TableCell>
+                    <TableCell>
+                      <Button onClick={()=>{setCampusDetails(item);setOpen(true);}}><Edit /></Button>
+                      <Button variant="outlined" color="success" onClick={() => setLocationId(item._id)}>View School</Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -422,6 +438,15 @@ export default function DashboardStats({
             />
           </TableContainer>
       }
+
+      <CampusDialog
+        open={open}
+        onClose={handleClose}
+        campus={getCampusDetails}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        setRefetch={setRefetch}
+      />
 
     </section>
   );
