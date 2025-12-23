@@ -73,7 +73,7 @@ function SideBar() {
                         );
                     })}
                 </ul>
-                <p className="text-[12px] text-gray-500 mt-2">© {new Date().getFullYear()} AGS soft solution. All rights reserved</p>
+                <p className="text-[12px] text-gray-500 mt-2">© {new Date().getFullYear()} AG soft solution. All rights reserved</p>
             </div>
         </nav>
     );

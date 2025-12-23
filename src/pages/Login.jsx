@@ -76,14 +76,14 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-blue-800 flex items-center justify-center p-4">
       <Card className="w-full max-w-md pt-0">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center mx-auto">
+        <CardHeader className="text-center mb-2">
+          <div className="flex items-center justify-center mx-auto w-[60%] mt-2">
             <img src={Logo} alt="Ag soft solution" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-800">
             School Management System
           </CardTitle>
-          <p className="text-gray-600 mt-2">Admin Dashboard Login</p>
+          {/* <p className="text-gray-600 mt-2">Admin Dashboard Login</p> */}
         </CardHeader>
         <CardContent>
           <Formik
