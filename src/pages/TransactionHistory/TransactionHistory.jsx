@@ -195,7 +195,7 @@ function TransactionHistory() {
                             )}
                         </TableBody>
                     </Table>
-                    {data?.count > 10 && (
+                    {data?.count && (
                         <TablePagination
                             component="div"
                             count={data?.count}
